@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+body {
+  background-color: #030712;
+  color: #f9fafb;
+}
+
+.scrambling {
+  color: #557295;
+}
+
+.card-glow-effect {
+  position: relative;
+  border: 1px solid #374151;
+}
+
+.card-glow-effect::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+      350px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+      rgba(59, 130, 246, 0.2),
+      transparent 80%
+  );
+  border-radius: 0.75rem;
+  transition: background 0.1s;
+}
+
+.futuristic-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: rgba(31, 41, 55, 0.5);
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.futuristic-button:hover {
+  background-color: rgb(55, 65, 81);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.futuristic-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(147, 197, 253, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.futuristic-button:hover::before {
+  left: 100%;
+}

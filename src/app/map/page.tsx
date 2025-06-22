@@ -1,13 +1,11 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Globe, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  ZoomableGroup,
-} from 'react-simple-maps';
+import { ArrowLeft, MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+
+const ComposableMap = lazy(() => import('react-simple-maps').then(module => ({ default: module.ComposableMap })));
+const Geographies = lazy(() => import('react-simple-maps').then(module => ({ default: module.Geographies })));
+const Geography = lazy(() => import('react-simple-maps').then(module => ({ default: module.Geography })));
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -16,142 +14,348 @@ interface VisitedCountry {
   name: string;
 }
 
+interface GeographyProps {
+  rsmKey: string;
+  id: string;
+  properties: {
+    name: string;
+  };
+}
+
+interface GeographiesRenderProps {
+  geographies: GeographyProps[];
+}
+
 const visitedCountries: VisitedCountry[] = [
-  { id: "GBR", name: "United Kingdom" },
-  { id: "ISL", name: "Iceland" },
-  { id: "FRA", name: "France" },
-  { id: "CHE", name: "Switzerland" },
-  { id: "JPN", name: "Japan" },
-  { id: "KOR", name: "South Korea" },
-  { id: "CHN", name: "China" },
-  { id: "IRL", name: "Ireland" },
-  { id: "MCO", name: "Monaco" },
-  { id: "BEL", name: "Belgium" },
-  { id: "NLD", name: "Netherlands" },
-  { id: "ITA", name: "Italy" },
-  { id: "VAT", name: "Vatican City" },
-  { id: "GRC", name: "Greece" },
-  { id: "DEU", name: "Germany" },
-  { id: "ESP", name: "Spain" },
-  { id: "PRT", name: "Portugal" },
-  { id: "SGP", name: "Singapore" },
-  { id: "ARE", name: "United Arab Emirates" },
-  { id: "CAN", name: "Canada" },
-  { id: "KWT", name: "Kuwait" },
-  { id: "SAU", name: "Saudi Arabia" },
-  { id: "USA", name: "United States" },
+  { id: "826", name: "United Kingdom" },
+  { id: "352", name: "Iceland" },
+  { id: "250", name: "France" },
+  { id: "756", name: "Switzerland" },
+  { id: "392", name: "Japan" },
+  { id: "410", name: "South Korea" },
+  { id: "156", name: "China" },
+  { id: "372", name: "Ireland" },
+  { id: "492", name: "Monaco" },
+  { id: "056", name: "Belgium" },
+  { id: "528", name: "Netherlands" },
+  { id: "380", name: "Italy" },
+  { id: "336", name: "Vatican City" },
+  { id: "300", name: "Greece" },
+  { id: "276", name: "Germany" },
+  { id: "724", name: "Spain" },
+  { id: "620", name: "Portugal" },
+  { id: "702", name: "Singapore" },
+  { id: "784", name: "United Arab Emirates" },
+  { id: "124", name: "Canada" },
+  { id: "414", name: "Kuwait" },
+  { id: "682", name: "Saudi Arabia" },
+  { id: "840", name: "United States" },
 ];
 
-const visitedCountryCodes = new Set(visitedCountries.map(c => c.id));
+const MapLoader = () => (
+  <div className="w-full h-full flex items-center justify-center bg-gray-800/30">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+      <p className="text-gray-400">Loading world map...</p>
+    </div>
+  </div>
+);
 
-const InteractiveTravelMap = () => {
-  const [tooltipContent, setTooltipContent] = useState("");
-  const [position, setPosition] = useState({ coordinates: [0, 0] as [number, number], zoom: 1 });
+const WorldMap = React.memo(({ 
+  visitedCountryCodes, 
+  onCountryClick, 
+  onCountryHover, 
+  onCountryLeave 
+}: {
+  visitedCountryCodes: Set<string>;
+  onCountryClick: (geo: GeographyProps) => void;
+  onCountryHover: (name: string) => void;
+  onCountryLeave: () => void;
+}) => (
+  <Suspense fallback={<MapLoader />}>
+    <ComposableMap
+      projectionConfig={{
+        rotate: [0, 0, 0],
+        scale: 160
+      }}
+      style={{ width: "100%", height: "100%" }}
+      viewBox="0 0 800 400"
+    >
+      <defs>
+        <linearGradient id="visitedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#1e40af" />
+        </linearGradient>
+        <linearGradient id="visitedGradientHover" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#60a5fa" />
+          <stop offset="100%" stopColor="#3b82f6" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge> 
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      
+      <Geographies geography={geoUrl}>
+        {({ geographies }: GeographiesRenderProps) =>
+          geographies.map((geo) => {
+            const isVisited = visitedCountryCodes.has(geo.id);
+            
+            return (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                onClick={() => onCountryClick(geo)}
+                onMouseEnter={() => onCountryHover(geo.properties.name)}
+                onMouseLeave={onCountryLeave}
+                style={{
+                  default: {
+                    fill: isVisited ? "#3b82f6" : "#1e293b",
+                    stroke: isVisited ? "#60a5fa" : "#334155",
+                    strokeWidth: isVisited ? 1.5 : 0.5,
+                    outline: "none",
+                    filter: isVisited ? "url(#glow)" : "none",
+                    transition: "all 0.3s ease",
+                  },
+                  hover: {
+                    fill: isVisited ? "#60a5fa" : "#374151",
+                    stroke: isVisited ? "#93c5fd" : "#4b5563",
+                    strokeWidth: isVisited ? 2 : 0.75,
+                    outline: "none",
+                    cursor: isVisited ? "pointer" : "default",
+                    filter: isVisited ? "url(#glow)" : "none",
+                  },
+                  pressed: {
+                    fill: isVisited ? "#1d4ed8" : "#374151",
+                    outline: "none",
+                  },
+                }}
+              />
+            );
+          })
+        }
+      </Geographies>
+    </ComposableMap>
+  </Suspense>
+));
 
-  function handleZoomIn() {
-    if (position.zoom >= 4) return;
-    setPosition(pos => ({ ...pos, zoom: pos.zoom * 1.5 }));
-  }
+WorldMap.displayName = 'WorldMap';
 
-  function handleZoomOut() {
-    if (position.zoom <= 1) return;
-    setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }));
-  }
+const VirtualizedCountryList = React.memo(({ 
+  countries, 
+  selectedCountry, 
+  onCountrySelect 
+}: {
+  countries: VisitedCountry[];
+  selectedCountry: VisitedCountry | null;
+  onCountrySelect: (country: VisitedCountry) => void;
+}) => {
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
+  
+  const visibleCountries = useMemo(() => 
+    countries.slice(visibleRange.start, visibleRange.end),
+    [countries, visibleRange]
+  );
 
-  function handleReset() {
-    setPosition({ coordinates: [0, 0], zoom: 1 });
-  }
+  const loadMore = useCallback(() => {
+    setVisibleRange(prev => ({
+      start: prev.start,
+      end: Math.min(prev.end + 10, countries.length)
+    }));
+  }, [countries.length]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-      <header className="bg-gray-800/50 backdrop-blur-lg border-b border-gray-700/50 p-4 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-            <span>Back to Portfolio</span>
-          </Link>
-          <h1 className="text-xl font-semibold">My Travel Footprint</h1>
+    <div className="space-y-3">
+      {visibleCountries.map(country => (
+        <div 
+          key={country.id} 
+          className={`group relative bg-gradient-to-r from-gray-800/50 to-gray-700/30 hover:from-blue-900/50 hover:to-purple-900/30 p-3 sm:p-4 rounded-xl border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+            selectedCountry?.id === country.id ? 'ring-2 ring-blue-500/50 bg-gradient-to-r from-blue-900/50 to-purple-900/30' : ''
+          }`}
+          onClick={() => onCountrySelect(country)}
+        >
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-blue-400 flex-shrink-0"/>
+            <span className="font-semibold text-white group-hover:text-blue-300 transition-colors text-sm sm:text-base">
+              {country.name}
+            </span>
+          </div>
+        </div>
+      ))}
+      
+      {visibleRange.end < countries.length && (
+        <button
+          onClick={loadMore}
+          className="w-full py-3 text-sm text-gray-400 hover:text-white transition-colors"
+        >
+          Load more countries...
+        </button>
+      )}
+    </div>
+  );
+});
+
+VirtualizedCountryList.displayName = 'VirtualizedCountryList';
+
+const InteractiveTravelMap = () => {
+  const [selectedCountry, setSelectedCountry] = useState<VisitedCountry | null>(null);
+  const [hoveredCountry, setHoveredCountry] = useState<string>("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const visitedCountryCodes = useMemo(
+    () => new Set(visitedCountries.map(c => c.id)), 
+    []
+  );
+
+  const sortedCountries = useMemo(
+    () => visitedCountries.sort((a, b) => a.name.localeCompare(b.name)),
+    []
+  );
+
+  const continentCount = useMemo(() => {
+    return 6;
+  }, []);
+
+  const handleCountryClick = useCallback((geo: GeographyProps) => {
+    const country = visitedCountries.find(c => c.id === geo.id);
+    if (country) {
+      setSelectedCountry(country);
+      if (window.innerWidth < 1024) {
+        setIsMobileMenuOpen(true);
+      }
+    }
+  }, []);
+
+  const handleCountryHover = useCallback((name: string) => {
+    setHoveredCountry(name);
+  }, []);
+
+  const handleCountryLeave = useCallback(() => {
+    setHoveredCountry("");
+  }, []);
+
+  const handleCountrySelect = useCallback((country: VisitedCountry) => {
+    setSelectedCountry(country);
+  }, []);
+
+  const isCountryVisited = useCallback((countryName: string) => {
+    return visitedCountries.some(country => 
+      country.name.toLowerCase() === countryName.toLowerCase()
+    );
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900 text-white">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <header className="relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-gray-800/50 group-hover:bg-blue-500/20 transition-all duration-300">
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <span className="font-medium text-sm sm:text-base">Back</span>
+            </Link>
+            
+            <div className="text-center flex-1 mx-4">
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
+                My Travel Footprint
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">
+                Exploring {visitedCountries.length} countries across the globe
+              </p>
+            </div>
+            
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg bg-gray-800/50 hover:bg-blue-500/20 transition-all duration-300"
+            >
+              {isMobileMenuOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+            
+            <div className="hidden lg:block w-20"></div>
+          </div>
         </div>
       </header>
 
-      <main className="flex-grow grid grid-cols-1 lg:grid-cols-4">
-        <div className="lg:col-span-3 relative bg-gray-800">
-           <ComposableMap
-              projectionConfig={{
-                rotate: [-10, 0, 0],
-                scale: 147
-              }}
-              style={{ width: "100%", height: "100%" }}
-            >
-              <ZoomableGroup
-                zoom={position.zoom}
-                center={position.coordinates}
-                onMoveEnd={(pos) => setPosition(pos)}
-              >
-                <Geographies geography={geoUrl}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      const isVisited = visitedCountryCodes.has(geo.id);
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          onMouseEnter={() => setTooltipContent(geo.properties.name)}
-                          onMouseLeave={() => setTooltipContent("")}
-                          style={{
-                            default: {
-                              fill: isVisited ? "#3b82f6" : "#272e42",
-                              stroke: "#1f2937",
-                              strokeWidth: 0.5,
-                              outline: "none",
-                            },
-                            hover: {
-                              fill: isVisited ? "#60a5fa" : "#4b5563",
-                              outline: "none",
-                              cursor: "pointer"
-                            },
-                            pressed: {
-                              fill: "#1d4ed8",
-                              outline: "none",
-                            },
-                          }}
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-              </ZoomableGroup>
-            </ComposableMap>
-            <div className="absolute bottom-4 right-4 flex flex-col space-y-2">
-                <button onClick={handleZoomIn} className="p-2 bg-gray-700 hover:bg-gray-600 rounded-full transition-colors"><ZoomIn className="w-5 h-5"/></button>
-                <button onClick={handleZoomOut} className="p-2 bg-gray-700 hover:bg-gray-600 rounded-full transition-colors"><ZoomOut className="w-5 h-5"/></button>
-                <button onClick={handleReset} className="p-2 bg-gray-700 hover:bg-gray-600 rounded-full transition-colors"><RotateCcw className="w-5 h-5"/></button>
-            </div>
-            {tooltipContent && (
-                <div className="absolute bottom-4 left-4 bg-gray-900/80 text-white text-sm px-3 py-1 rounded-md">
-                    {tooltipContent}
-                </div>
-            )}
+      <main className="relative z-10">
+        <div className={`lg:hidden transition-all duration-300 overflow-hidden ${
+          isMobileMenuOpen ? 'max-h-96' : 'max-h-0'
+        }`}>
+          <div className="bg-gray-900/90 backdrop-blur-xl border-b border-gray-700/30 p-4 max-h-96 overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-3 flex items-center">
+              <Globe className="w-5 h-5 mr-2 text-blue-400"/>
+              Visited Countries ({visitedCountries.length})
+            </h3>
+            <VirtualizedCountryList
+              countries={sortedCountries}
+              selectedCountry={selectedCountry}
+              onCountrySelect={handleCountrySelect}
+            />
+          </div>
         </div>
 
-        <div className="lg:col-span-1 bg-gray-800/50 border-l border-gray-700/50 p-6 overflow-y-auto">
-          <div className="sticky top-20">
-            <h2 className="text-2xl font-bold mb-4 flex items-center">
-              <Globe className="w-6 h-6 mr-2 text-blue-400"/>
-              Visited Countries
-            </h2>
-            <p className="text-gray-400 mb-6">
-              I&apos;ve had the privilege of exploring {visitedCountries.length} countries and regions, each offering unique perspectives on technology, culture, and life.
-            </p>
-            <div className="space-y-2">
-              {visitedCountries
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map(country => (
-                  <div key={country.id} className="flex items-center bg-gray-700/50 p-3 rounded-lg">
-                    <MapPin className="w-5 h-5 mr-3 text-blue-400 flex-shrink-0"/>
-                    <span className="font-medium">{country.name}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-4 h-[calc(100vh-100px)]">
+          <div className="lg:col-span-3 relative bg-gradient-to-br from-gray-800/30 to-gray-900/50 backdrop-blur-sm">
+            <WorldMap
+              visitedCountryCodes={visitedCountryCodes}
+              onCountryClick={handleCountryClick}
+              onCountryHover={handleCountryHover}
+              onCountryLeave={handleCountryLeave}
+            />
+            
+            {hoveredCountry && (
+              <div className="absolute bottom-4 left-4 right-4 sm:right-auto bg-gray-900/90 backdrop-blur-lg text-white text-sm px-3 sm:px-4 py-2 rounded-xl border border-gray-700/50 shadow-2xl">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-3 h-3 rounded-full ${isCountryVisited(hoveredCountry) ? 'bg-blue-400' : 'bg-gray-500'}`}></div>
+                  <span className="font-medium truncate">{hoveredCountry}</span>
+                  {isCountryVisited(hoveredCountry) && <span className="text-blue-300 text-xs">✓ Visited</span>}
+                </div>
+              </div>
+            )}
+
+            <div className="absolute top-4 right-4">
+              <div className="bg-gray-900/80 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-gray-700/30 shadow-2xl">
+                <div className="flex items-center space-x-3 sm:space-x-4">
+                  <div className="text-center">
+                    <div className="text-lg sm:text-2xl font-bold text-blue-400">{visitedCountries.length}</div>
+                    <div className="text-xs text-gray-400">Countries</div>
                   </div>
-              ))}
+                  <div className="w-px h-6 sm:h-8 bg-gray-700"></div>
+                  <div className="text-center">
+                    <div className="text-lg sm:text-2xl font-bold text-purple-400">{continentCount}</div>
+                    <div className="text-xs text-gray-400">Continents</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden lg:block lg:col-span-1 bg-gray-900/60 backdrop-blur-xl border-l border-gray-700/30 overflow-y-auto">
+            <div className="p-6">
+              <div className="sticky top-0 bg-gray-900/60 backdrop-blur-xl -mx-6 px-6 py-4 border-b border-gray-700/30 mb-6">
+                <h2 className="text-xl font-bold mb-2 flex items-center">
+                  <Globe className="w-6 h-6 mr-3 text-blue-400"/>
+                  Visited Countries
+                </h2>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Each destination has shaped my perspective on technology, culture, and innovation.
+                </p>
+              </div>
+              
+              <VirtualizedCountryList
+                countries={sortedCountries}
+                selectedCountry={selectedCountry}
+                onCountrySelect={handleCountrySelect}
+              />
             </div>
           </div>
         </div>
@@ -159,5 +363,7 @@ const InteractiveTravelMap = () => {
     </div>
   );
 };
+
+InteractiveTravelMap.displayName = 'InteractiveTravelMap';
 
 export default InteractiveTravelMap;

@@ -8,20 +8,20 @@ import FloatingMenu from "@/components/ui/FloatingMenu";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Yijun Xiang's Portfolio",
+  title: "Yijun Xiang",
   description: "AI Developer & Researcher - Building intelligent systems to solve human-centric problems",
   keywords: ["AI", "Machine Learning", "Software Engineer", "UC Berkeley", "Computer Science"],
   authors: [{ name: "Yijun Xiang" }],
   openGraph: {
-    title: "Yijun Xiang's Portfolio",
+    title: "Yijun Xiang",
     description: "AI Developer & Researcher specializing in intelligent systems and human-centric AI solutions",
     url: "https://yijunxiang.com",
-    siteName: "Yijun Xiang Portfolio",
+    siteName: "Yijun Xiang",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yijun Xiang's Portfolio",
+    title: "Yijun Xiang",
     description: "AI Developer & Researcher - Building intelligent systems to solve human-centric problems",
   },
 };

@@ -128,22 +128,22 @@ const ChatbotPage = () => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [messageCount, setMessageCount] = useState<MessageCount>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('messageCount');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Date.now() > parsed.resetTime) {
-          const newCount = { count: 0, resetTime: Date.now() + 86400000 };
-          localStorage.setItem('messageCount', JSON.stringify(newCount));
-          return newCount;
-        }
-        return parsed;
+  const [messageCount, setMessageCount] = useState<MessageCount>({ count: 0, resetTime: Date.now() + 86400000 });
+  const [serverRemaining, setServerRemaining] = useState<number | null>(null);
+  
+  useEffect(() => {
+    const saved = localStorage.getItem('messageCount');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Date.now() > parsed.resetTime) {
+        const newCount = { count: 0, resetTime: Date.now() + 86400000 };
+        localStorage.setItem('messageCount', JSON.stringify(newCount));
+        setMessageCount(newCount);
+      } else {
+        setMessageCount(parsed);
       }
     }
-    return { count: 0, resetTime: Date.now() + 86400000 };
-  });
-  const [serverRemaining, setServerRemaining] = useState<number | null>(null);
+  }, []);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);

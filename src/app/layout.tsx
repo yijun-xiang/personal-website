@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import { GA_TRACKING_ID } from "@/lib/analytics";
+import FloatingMenu from "@/components/ui/FloatingMenu";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Yijun Xiang's Portfolio",
     description: "AI Developer & Researcher specializing in intelligent systems and human-centric AI solutions",
-    url: "https://your-domain.com", // 替换为你的域名
+    url: "https://yijunxiang.com",
     siteName: "Yijun Xiang Portfolio",
     type: "website",
   },
@@ -33,10 +34,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* Google Analytics */}
         {GA_TRACKING_ID && <GoogleAnalytics gaId={GA_TRACKING_ID} />}
         
         {children}
+        
+        <FloatingMenu />
       </body>
     </html>
   );

@@ -2,9 +2,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Code, FileText, Plus } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 const FloatingMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  if (pathname === '/projects' || pathname === '/research') {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-8 right-8 z-50">

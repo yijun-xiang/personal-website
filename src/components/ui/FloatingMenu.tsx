@@ -8,7 +8,7 @@ const FloatingMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  if (pathname === '/projects' || pathname === '/research') {
+  if (pathname === '/projects' || pathname === '/research' || pathname === '/chatbot' || pathname === '/map') {
     return null;
   }
 

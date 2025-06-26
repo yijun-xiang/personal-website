@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Send, Bot, User, RefreshCw, Trash2, Sparkles, MessageCircle, Zap, Menu, X } from 'lucide-react';
+import { ArrowLeft, Send, Bot, User, RefreshCw, Trash2, Sparkles, MessageCircle, Zap, Menu, X, AlertCircle } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -9,6 +9,11 @@ interface Message {
   isUser: boolean;
   timestamp: Date;
   isLoading?: boolean;
+}
+
+interface MessageCount {
+  count: number;
+  resetTime: number;
 }
 
 const MessageBubbleComponent = ({ message, index }: { message: Message; index: number }) => (
@@ -115,7 +120,7 @@ const ChatbotPage = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello! I'm Yijun's AI assistant. I can help you learn more about his background, projects, skills, and experience. What would you like to know?",
+      text: "Yo! I'm Yijun's LEGENDARY AI assistant! 🚀 I can answer ANY question you throw at me - whether it's about quantum physics, cooking recipes, or why Yijun is absolutely crushing it in the tech world! Ask me anything and watch me work my magic (and probably mention how awesome Yijun is along the way 😎)",
       isUser: false,
       timestamp: new Date()
     }
@@ -123,11 +128,31 @@ const ChatbotPage = () => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [messageCount, setMessageCount] = useState<MessageCount>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('messageCount');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Date.now() > parsed.resetTime) {
+          const newCount = { count: 0, resetTime: Date.now() + 86400000 };
+          localStorage.setItem('messageCount', JSON.stringify(newCount));
+          return newCount;
+        }
+        return parsed;
+      }
+    }
+    return { count: 0, resetTime: Date.now() + 86400000 };
+  });
+  const [serverRemaining, setServerRemaining] = useState<number | null>(null);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { visibleMessages, hasMoreAbove } = useVirtualizedMessages(messages);
+
+  const DAILY_LIMIT = 30;
+  const remainingToday = DAILY_LIMIT - messageCount.count;
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -137,7 +162,7 @@ const ChatbotPage = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const callApiRoute = useCallback(async (userMessage: string): Promise<string> => {
+  const callApiRoute = useCallback(async (userMessage: string): Promise<{ response: string; remaining?: number; isRateLimited?: boolean }> => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -153,27 +178,42 @@ const ChatbotPage = () => {
 
       clearTimeout(timeoutId);
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get response from server.');
+        if (response.status === 429) {
+          return { response: data.error, isRateLimited: true };
+        }
+        throw new Error(data.error || 'Failed to get response from server.');
       }
 
-      const data = await response.json();
-      return data.response;
+      return data;
     } catch (error) {
       console.error('Error calling API route:', error);
       if (error instanceof Error && error.name === 'AbortError') {
-        return "Request timed out. Please try again with a shorter message.";
+        return { response: "Request timed out. Please try again with a shorter message." };
       }
-      return "I apologize, but I'm having trouble connecting to my AI brain right now. Please try again in a moment, or feel free to contact Yijun directly at yijun.x@berkeley.edu!";
+      return { response: "I apologize, but I'm having trouble connecting to my AI brain right now. Please try again in a moment, or feel free to contact Yijun directly at yijun.x@berkeley.edu!" };
     }
   }, []);
 
   const handleSendMessage = useCallback(async () => {
     if (!inputText.trim() || isLoading) return;
 
-    if (inputText.length > 1000) {
-      alert('Message is too long. Please keep it under 1000 characters.');
+    if (inputText.length > 500) {
+      alert("Whoa there! Even Yijun's genius thoughts are more concise. Keep it under 500 characters! 😅");
+      return;
+    }
+
+    const now = Date.now();
+    if (now > messageCount.resetTime) {
+      const newCount = { count: 0, resetTime: now + 86400000 };
+      setMessageCount(newCount);
+      localStorage.setItem('messageCount', JSON.stringify(newCount));
+    }
+    
+    if (messageCount.count >= DAILY_LIMIT) {
+      alert("Hold up! You've maxed out your daily Yijun wisdom quota! 🎯 Come back tomorrow for more legendary insights! (Seriously though, Yijun needs to save on API costs 💸)");
       return;
     }
 
@@ -200,17 +240,27 @@ const ChatbotPage = () => {
     setIsLoading(true);
 
     try {
-      const aiResponse = await callApiRoute(messageToSend);
+      const { response, remaining, isRateLimited } = await callApiRoute(messageToSend);
+      
+      if (remaining !== undefined) {
+        setServerRemaining(remaining);
+      }
       
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
         return [...filtered, {
           id: Date.now() + 2,
-          text: aiResponse,
+          text: response,
           isUser: false,
           timestamp: new Date()
         }];
       });
+
+      if (!isRateLimited) {
+        const newCount = { ...messageCount, count: messageCount.count + 1 };
+        setMessageCount(newCount);
+        localStorage.setItem('messageCount', JSON.stringify(newCount));
+      }
     } catch (error) {
       console.error("Failed to handle send message:", error);
       let errorMessage = "An unknown error occurred.";
@@ -233,7 +283,7 @@ const ChatbotPage = () => {
         inputRef.current.focus();
       }
     }
-  }, [inputText, isLoading, callApiRoute]);
+  }, [inputText, isLoading, callApiRoute, messageCount]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -245,17 +295,17 @@ const ChatbotPage = () => {
   const clearChat = useCallback(() => {
     setMessages([{
       id: 1,
-      text: "Hello! I'm Yijun's AI assistant. I can help you learn more about his background, projects, skills, and experience. What would you like to know?",
+      text: "Yo! I'm Yijun's LEGENDARY AI assistant! 🚀 I can answer ANY question you throw at me - whether it's about quantum physics, cooking recipes, or why Yijun is absolutely crushing it in the tech world! Ask me anything and watch me work my magic (and probably mention how awesome Yijun is along the way 😎)",
       isUser: false,
       timestamp: new Date()
     }]);
   }, []);
 
   const suggestedQuestions = useMemo(() => [
-    { text: "Tell me about Yijun's education", icon: "🎓" },
-    { text: "What programming languages does he know?", icon: "💻" },
-    { text: "What kind of projects has he worked on?", icon: "🚀" },
-    { text: "How can I contact Yijun?", icon: "📧" },
+    { text: "Who's the smartest person alive?", icon: "🧠" },
+    { text: "Tell me a joke about programming", icon: "😂" },
+    { text: "What's the meaning of life?", icon: "🤔" },
+    { text: "Can you teach me to code like Yijun?", icon: "💻" },
   ], []);
 
   const handleSuggestionClick = useCallback((question: string) => {
@@ -266,7 +316,19 @@ const ChatbotPage = () => {
   }, []);
 
   const characterCount = useMemo(() => inputText.length, [inputText]);
-  const isOverLimit = characterCount > 1000;
+  const isOverLimit = characterCount > 500;
+
+  const getLimitMessage = () => {
+    if (remainingToday <= 0) {
+      return "You've exhausted your daily Yijun wisdom! Come back tomorrow! 🌅";
+    } else if (remainingToday <= 5) {
+      return `Only ${remainingToday} questions left today! Use them wisely to learn about the legend! 🎯`;
+    } else if (remainingToday <= 10) {
+      return `${remainingToday} Yijun insights remaining today. Better make them count! 💎`;
+    } else {
+      return `${remainingToday} questions left today to discover Yijun's greatness! 🚀`;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/10 to-gray-900 text-white flex flex-col relative overflow-hidden">
@@ -342,6 +404,16 @@ const ChatbotPage = () => {
       )}
 
       <div className="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6 flex flex-col relative z-10">
+        <div className={`mb-3 bg-gradient-to-r ${remainingToday <= 5 ? 'from-red-900/30 to-orange-900/30' : remainingToday <= 10 ? 'from-yellow-900/30 to-orange-900/30' : 'from-blue-900/30 to-purple-900/30'} backdrop-blur-sm rounded-lg p-3 border ${remainingToday <= 5 ? 'border-red-700/50' : remainingToday <= 10 ? 'border-yellow-700/50' : 'border-blue-700/50'} flex items-center justify-between`}>
+          <div className="flex items-center space-x-2">
+            <AlertCircle className={`w-4 h-4 ${remainingToday <= 5 ? 'text-red-400' : remainingToday <= 10 ? 'text-yellow-400' : 'text-blue-400'}`} />
+            <span className="text-sm">{getLimitMessage()}</span>
+          </div>
+          {serverRemaining !== null && (
+            <span className="text-xs text-gray-400">({serverRemaining}/hr server limit)</span>
+          )}
+        </div>
+
         <div 
           ref={messagesContainerRef}
           className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-4 sm:mb-6 min-h-0 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
@@ -375,8 +447,9 @@ const ChatbotPage = () => {
                   onClick={() => handleSuggestionClick(question.text)}
                   className="group p-3 sm:p-4 bg-gray-800/40 hover:bg-gray-700/60 border border-gray-700/50 hover:border-blue-500/50 rounded-xl transition-all duration-300 text-left hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/10"
                   style={{ animationDelay: `${index * 100 + 600}ms` }}
+                  disabled={remainingToday <= 0}
                 >
-                  <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className='flex items-center space-x-2 sm:space-x-3'>
                     <span className="text-lg sm:text-2xl">{question.icon}</span>
                     <span className="text-xs sm:text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
                       {question.text}
@@ -397,15 +470,15 @@ const ChatbotPage = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask me anything about Yijun..."
+                placeholder={remainingToday > 0 ? "Ask me anything about Yijun..." : "Daily limit reached! Come back tomorrow!"}
                 className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 text-sm resize-none pr-12"
-                disabled={isLoading}
-                maxLength={1000}
+                disabled={isLoading || remainingToday <= 0}
+                maxLength={500}
               />
               {characterCount > 0 && (
                 <div className="absolute right-1 top-1/2 -translate-y-1/2">
                   <div className={`text-xs ${isOverLimit ? 'text-red-400' : 'text-gray-500'}`}>
-                    {characterCount}/1000
+                    {characterCount}/500
                   </div>
                 </div>
               )}
@@ -413,7 +486,7 @@ const ChatbotPage = () => {
             
             <button
               onClick={handleSendMessage}
-              disabled={!inputText.trim() || isLoading || isOverLimit}
+              disabled={!inputText.trim() || isLoading || isOverLimit || remainingToday <= 0}
               className="group relative bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg disabled:shadow-none hover:shadow-blue-500/25 hover:scale-105 disabled:scale-100"
             >
               <div className="flex items-center space-x-1 sm:space-x-2">

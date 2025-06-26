@@ -10,7 +10,6 @@ import { trackEvent } from '@/lib/analytics';
 const Hero = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   
-  // Mouse tracking for glow effect
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -20,7 +19,6 @@ const Hero = () => {
     cardRef.current.style.setProperty('--mouse-y', `${y}px`);
   };
 
-  // Progressive entrance animation
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -38,16 +36,15 @@ const Hero = () => {
       onMouseMove={handleMouseMove}
       className="card-glow-effect w-full max-w-4xl bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 md:p-12 z-10 border border-gray-700/50"
     >
-      {/* Header with name and social links */}
       <header 
         className={`flex flex-col md:flex-row items-center justify-between mb-8 ${getAnimClass()}`} 
         style={{transitionDelay: '100ms'}}
       >
         <div className="text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent hover:from-blue-200 hover:to-purple-300 transition-all duration-500">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent hover:from-blue-200 hover:to-purple-300 transition-all duration-500 leading-tight pb-1">
             {personalInfo.name}
           </h1>
-          <div className="h-8 mt-2 text-xl md:text-2xl text-blue-300 font-light transition-all duration-500">
+          <div className="h-10 mt-2 text-xl md:text-2xl text-blue-300 font-light transition-all duration-500 overflow-visible">
             <ScrambleText phrases={personalInfo.languages} />
           </div>
         </div>
@@ -83,7 +80,6 @@ const Hero = () => {
         </div>
       </header>
       
-      {/* Main content */}
       <main>
         <p 
           className={`text-lg text-gray-300 leading-relaxed max-w-3xl ${getAnimClass()}`} 
@@ -97,7 +93,6 @@ const Hero = () => {
           style={{transitionDelay: '300ms'}}
         />
         
-        {/* University section */}
         <div 
           className={`flex items-center bg-gray-900/40 backdrop-blur-sm p-4 rounded-lg border border-gray-700/30 ${getAnimClass()}`} 
           style={{transitionDelay: '400ms'}}
@@ -109,7 +104,6 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Action buttons */}
         <footer className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link 
             href="/chatbot" 

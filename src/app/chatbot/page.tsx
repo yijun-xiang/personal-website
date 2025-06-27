@@ -342,15 +342,17 @@ const ChatbotPage = () => {
       <header className="relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 shadow-2xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
-              <div className="p-1.5 sm:p-2 rounded-lg bg-gray-800/50 group-hover:bg-blue-500/20 transition-all duration-300">
-                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-              </div>
-              <span className="font-medium text-sm sm:text-base hidden sm:block">Back to Portfolio</span>
-              <span className="font-medium text-sm sm:text-base sm:hidden">Back</span>
-            </Link>
+            <div className="flex-1 flex items-center">
+              <Link href="/" className="group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-gray-800/50 group-hover:bg-blue-500/20 transition-all duration-300">
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <span className="font-medium text-sm sm:text-base hidden sm:block">Back to Portfolio</span>
+                <span className="font-medium text-sm sm:text-base sm:hidden">Back</span>
+              </Link>
+            </div>
             
-            <div className="flex items-center space-x-2 sm:space-x-3 flex-1 justify-center">
+            <div className="flex items-center space-x-2 sm:space-x-3 px-4">
               <div className="relative">
                 <Bot className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
                 <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -363,7 +365,7 @@ const ChatbotPage = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex-1 flex items-center justify-end space-x-2">
               <button
                 onClick={clearChat}
                 className="p-1.5 sm:p-2 text-gray-400 hover:text-white hover:bg-red-500/20 rounded-lg transition-all duration-300 group"

@@ -471,12 +471,12 @@ const ChatbotPage = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={remainingToday > 0 ? "Ask me anything about Yijun..." : "Daily limit reached! Come back tomorrow!"}
-                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 text-sm resize-none pr-12"
+                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 text-sm resize-none pr-16"
                 disabled={isLoading || remainingToday <= 0}
                 maxLength={500}
               />
               {characterCount > 0 && (
-                <div className="absolute right-1 top-1/2 -translate-y-1/2">
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
                   <div className={`text-xs ${isOverLimit ? 'text-red-400' : 'text-gray-500'}`}>
                     {characterCount}/500
                   </div>

@@ -462,7 +462,7 @@ const ChatbotPage = () => {
         )}
 
         <div className="relative">
-          <div className="flex space-x-2 sm:space-x-4 bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xl">
+          <div className="flex items-center space-x-2 sm:space-x-4 bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xl">
             <div className="flex-1 relative">
               <input
                 ref={inputRef}
@@ -471,7 +471,7 @@ const ChatbotPage = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={remainingToday > 0 ? "Ask me anything about Yijun..." : "Daily limit reached! Come back tomorrow!"}
-                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 text-sm resize-none pr-16"
+                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 text-sm resize-none pr-14"
                 disabled={isLoading || remainingToday <= 0}
                 maxLength={500}
               />

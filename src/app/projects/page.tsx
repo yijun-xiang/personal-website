@@ -1,27 +1,42 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Github, Star, Code, Zap, Shield, Gauge, Search, Database, Server } from 'lucide-react';
 
 const ProjectsPage = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/10 to-gray-900 text-white">
+    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/10 to-gray-900 text-white transition-all duration-700 ${
+      isLoaded ? 'opacity-100' : 'opacity-0'
+    }`}>
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(139,92,246,0.1),transparent_50%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.1),transparent_50%)]"></div>
       </div>
 
-      <header className="relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30">
+      <header className={`relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 transition-all duration-700 ${
+        isLoaded ? 'translate-y-0' : '-translate-y-4'
+      }`} style={{ transitionDelay: '100ms' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <Link href="/" className="group inline-flex items-center space-x-3 text-gray-300 hover:text-white transition-all">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Back to Home</span>
+            <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-purple-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/20">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-blue-600/0 group-hover:from-purple-600/20 group-hover:to-blue-600/20 rounded-xl transition-all duration-300"></div>
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+            </div>
+            <span className="font-medium group-hover:text-purple-300 transition-colors duration-300">Back to Home</span>
           </Link>
         </div>
       </header>
 
       <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-6">
-        <div className="text-center mb-12">
+        <div className={`text-center mb-12 transition-all duration-700 ${
+          isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`} style={{ transitionDelay: '200ms' }}>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-300 to-blue-300 bg-clip-text text-transparent mb-4 leading-tight pt-2">
             My Projects
           </h1>
@@ -29,7 +44,9 @@ const ProjectsPage = () => {
         </div>
 
         <div className="space-y-8">
-          <div className="bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/50 shadow-lg shadow-blue-500/20">
+          <div className={`bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/50 shadow-lg shadow-blue-500/20 transition-all duration-700 ${
+            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`} style={{ transitionDelay: '300ms' }}>
             <div className="flex items-center gap-2 mb-6">
               <span className="bg-gradient-to-r from-blue-600 to-cyan-600 text-xs px-4 py-1 rounded-full font-semibold flex items-center gap-1">
                 <Star className="w-3 h-3" />
@@ -117,7 +134,9 @@ const ProjectsPage = () => {
             </div>
           </div>
 
-          <div className="bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/50 shadow-lg shadow-blue-500/20">
+          <div className={`bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/50 shadow-lg shadow-blue-500/20 transition-all duration-700 ${
+            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`} style={{ transitionDelay: '400ms' }}>
             <div className="flex items-center gap-2 mb-6">
               <span className="bg-gradient-to-r from-blue-600 to-cyan-600 text-xs px-4 py-1 rounded-full font-semibold flex items-center gap-1">
                 <Star className="w-3 h-3" />
@@ -203,7 +222,9 @@ const ProjectsPage = () => {
           </div>
         </div>
 
-        <div className="mt-12 text-center">
+        <div className={`mt-12 text-center transition-all duration-700 ${
+          isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`} style={{ transitionDelay: '500ms' }}>
           <p className="text-gray-400">
             More projects coming soon! Follow me on{' '}
             <a 

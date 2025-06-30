@@ -130,6 +130,11 @@ const ChatbotPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [messageCount, setMessageCount] = useState<MessageCount>({ count: 0, resetTime: Date.now() + 86400000 });
   const [serverRemaining, setServerRemaining] = useState<number | null>(null);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+  
+  useEffect(() => {
+    setIsPageLoaded(true);
+  }, []);
   
   useEffect(() => {
     const saved = localStorage.getItem('messageCount');
@@ -331,7 +336,9 @@ const ChatbotPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/10 to-gray-900 text-white flex flex-col relative overflow-hidden">
+    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/10 to-gray-900 text-white flex flex-col relative overflow-hidden transition-all duration-700 ${
+      isPageLoaded ? 'opacity-100' : 'opacity-0'
+    }`}>
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.1),transparent_50%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.1),transparent_50%)]"></div>
@@ -339,36 +346,30 @@ const ChatbotPage = () => {
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <header className="relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 shadow-2xl">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+      <header className={`relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 shadow-2xl transition-all duration-700 ${
+        isPageLoaded ? 'translate-y-0' : '-translate-y-4'
+      }`} style={{ transitionDelay: '100ms' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex-1 flex items-center">
-              <Link href="/" className="group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
-                <div className="p-1.5 sm:p-2 rounded-lg bg-gray-800/50 group-hover:bg-blue-500/20 transition-all duration-300">
-                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                </div>
-                <span className="font-medium text-sm sm:text-base hidden sm:block">Back to Portfolio</span>
-                <span className="font-medium text-sm sm:text-base sm:hidden">Back</span>
-              </Link>
+            <Link href="/" className="group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
+              <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-blue-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-purple-600/0 group-hover:from-blue-600/20 group-hover:to-purple-600/20 rounded-xl transition-all duration-300"></div>
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+              </div>
+              <span className="font-medium text-sm sm:text-base group-hover:text-blue-300 transition-colors duration-300">Back to Home</span>
+            </Link>
+            
+            <div className="text-center flex-1 mx-4">
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-blue-300 to-purple-300 bg-clip-text text-transparent animate-gradient">
+                AI Assistant
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">Powered by GPT • Online</p>
             </div>
             
-            <div className="flex items-center space-x-2 sm:space-x-3 px-4">
-              <div className="relative">
-                <Bot className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full animate-pulse"></div>
-              </div>
-              <div className="text-center">
-                <h1 className="text-base sm:text-xl font-bold bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
-                  AI Assistant
-                </h1>
-                <p className="text-xs text-gray-400 hidden sm:block">Powered by GPT • Online</p>
-              </div>
-            </div>
-            
-            <div className="flex-1 flex items-center justify-end space-x-2">
+            <div className="flex items-center justify-end space-x-2">
               <button
                 onClick={clearChat}
-                className="p-1.5 sm:p-2 text-gray-400 hover:text-white hover:bg-red-500/20 rounded-lg transition-all duration-300 group"
+                className="p-2 text-gray-400 hover:text-white hover:bg-red-500/20 rounded-lg transition-all duration-300 group"
                 title="Clear chat"
               >
                 <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
@@ -376,7 +377,7 @@ const ChatbotPage = () => {
               
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="sm:hidden p-1.5 text-gray-400 hover:text-white hover:bg-gray-500/20 rounded-lg transition-all duration-300"
+                className="sm:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-500/20 rounded-lg transition-all duration-300"
               >
                 {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </button>
@@ -405,7 +406,9 @@ const ChatbotPage = () => {
         </div>
       )}
 
-      <div className="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6 flex flex-col relative z-10">
+      <div className={`flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6 flex flex-col relative z-10 transition-all duration-700 ${
+        isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+      }`} style={{ transitionDelay: '200ms' }}>
         <div className={`mb-3 bg-gradient-to-r ${remainingToday <= 5 ? 'from-red-900/30 to-orange-900/30' : remainingToday <= 10 ? 'from-yellow-900/30 to-orange-900/30' : 'from-blue-900/30 to-purple-900/30'} backdrop-blur-sm rounded-lg p-3 border ${remainingToday <= 5 ? 'border-red-700/50' : remainingToday <= 10 ? 'border-yellow-700/50' : 'border-blue-700/50'} flex items-center justify-between`}>
           <div className="flex items-center space-x-2">
             <AlertCircle className={`w-4 h-4 ${remainingToday <= 5 ? 'text-red-400' : remainingToday <= 10 ? 'text-yellow-400' : 'text-blue-400'}`} />
@@ -435,7 +438,9 @@ const ChatbotPage = () => {
         </div>
 
         {messages.length <= 2 && (
-          <div className="mb-4 sm:mb-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-500">
+          <div className={`mb-4 sm:mb-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-500 transition-all ${
+            isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          }`} style={{ transitionDelay: '300ms' }}>
             <div className="text-center mb-3 sm:mb-4">
               <p className="text-xs sm:text-sm text-gray-400 mb-3 flex items-center justify-center space-x-2">
                 <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -463,7 +468,9 @@ const ChatbotPage = () => {
           </div>
         )}
 
-        <div className="relative">
+        <div className={`relative transition-all duration-700 ${
+          isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`} style={{ transitionDelay: '400ms' }}>
           <div className="flex items-center space-x-2 sm:space-x-4 bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xl">
             <div className="flex-1 relative">
               <input

@@ -31,106 +31,114 @@ const Hero = () => {
     }`;
   
   return (
-    <div 
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      className="card-glow-effect w-full max-w-4xl bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 md:p-12 z-10 border border-gray-700/50"
-    >
-      <header 
-        className={`flex flex-col md:flex-row items-center justify-between mb-8 ${getAnimClass()}`} 
-        style={{transitionDelay: '100ms'}}
-      >
-        <div className="text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent hover:from-blue-200 hover:to-purple-300 transition-all duration-500 leading-tight pb-1">
-            {personalInfo.name}
-          </h1>
-          <div className="h-10 mt-2 text-xl md:text-2xl text-blue-300 font-light transition-all duration-500 overflow-visible">
-            <ScrambleText phrases={personalInfo.languages} />
-          </div>
-        </div>
-        <div className="flex items-center space-x-4 mt-6 md:mt-0">
-          <a 
-            href={`mailto:${personalInfo.email}`} 
-            title="Email" 
-            onClick={() => trackEvent.socialClick('email')}
-            className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
-          >
-            <Mail className="w-6 h-6 text-gray-300 hover:text-blue-300" />
-          </a>
-          <a 
-            href={personalInfo.linkedin} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            title="LinkedIn" 
-            onClick={() => trackEvent.socialClick('linkedin')}
-            className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
-          >
-            <Linkedin className="w-6 h-6 text-gray-300 hover:text-blue-300" />
-          </a>
-          <a 
-            href={personalInfo.github} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            title="GitHub" 
-            onClick={() => trackEvent.socialClick('github')}
-            className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
-          >
-            <Github className="w-6 h-6 text-gray-300 hover:text-blue-300" />
-          </a>
-        </div>
-      </header>
+    <div className="relative">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-full blur-3xl animate-spin-slow"></div>
+      </div>
       
-      <main>
-        <p 
-          className={`text-lg text-gray-300 leading-relaxed max-w-3xl ${getAnimClass()}`} 
-          style={{transitionDelay: '200ms'}}
+      <div 
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        className="card-glow-effect w-full max-w-4xl bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 md:p-12 z-10 border border-gray-700/50 relative"
+      >
+        <header 
+          className={`flex flex-col md:flex-row items-center justify-between mb-8 ${getAnimClass()}`} 
+          style={{transitionDelay: '100ms'}}
         >
-          {personalInfo.mission}
-        </p>
-        
-        <div 
-          className={`my-8 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent ${getAnimClass()}`} 
-          style={{transitionDelay: '300ms'}}
-        />
-        
-        <div 
-          className={`flex items-center bg-gray-900/40 backdrop-blur-sm p-4 rounded-lg border border-gray-700/30 ${getAnimClass()}`} 
-          style={{transitionDelay: '400ms'}}
-        >
-          <BerkeleyLogo />
-          <div>
-            <p className="font-semibold text-white">{personalInfo.university}</p>
-            <p className="text-gray-400 text-sm">{personalInfo.degree}</p>
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent hover:from-blue-200 hover:to-purple-300 transition-all duration-500 leading-tight pb-1">
+              {personalInfo.name}
+            </h1>
+            <div className="h-10 mt-2 text-xl md:text-2xl text-blue-300 font-light transition-all duration-500 overflow-visible">
+              <ScrambleText phrases={personalInfo.languages} />
+            </div>
           </div>
-        </div>
+          <div className="flex items-center space-x-4 mt-6 md:mt-0">
+            <a 
+              href={`mailto:${personalInfo.email}`} 
+              title="Email" 
+              onClick={() => trackEvent.socialClick('email')}
+              className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
+            >
+              <Mail className="w-6 h-6 text-gray-300 hover:text-blue-300" />
+            </a>
+            <a 
+              href={personalInfo.linkedin} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              title="LinkedIn" 
+              onClick={() => trackEvent.socialClick('linkedin')}
+              className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
+            >
+              <Linkedin className="w-6 h-6 text-gray-300 hover:text-blue-300" />
+            </a>
+            <a 
+              href={personalInfo.github} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              title="GitHub" 
+              onClick={() => trackEvent.socialClick('github')}
+              className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
+            >
+              <Github className="w-6 h-6 text-gray-300 hover:text-blue-300" />
+            </a>
+          </div>
+        </header>
+        
+        <main>
+          <p 
+            className={`text-lg text-gray-300 leading-relaxed max-w-3xl ${getAnimClass()}`} 
+            style={{transitionDelay: '200ms'}}
+          >
+            {personalInfo.mission}
+          </p>
+          
+          <div 
+            className={`my-8 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent ${getAnimClass()}`} 
+            style={{transitionDelay: '300ms'}}
+          />
+          
+          <div 
+            className={`flex items-center bg-gray-900/40 backdrop-blur-sm p-4 rounded-lg border border-gray-700/30 ${getAnimClass()}`} 
+            style={{transitionDelay: '400ms'}}
+          >
+            <BerkeleyLogo />
+            <div>
+              <p className="font-semibold text-white">{personalInfo.university}</p>
+              <p className="text-gray-400 text-sm">{personalInfo.degree}</p>
+            </div>
+          </div>
 
-        <footer className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link 
-            href="/chatbot" 
-            onClick={() => trackEvent.navigationClick('chatbot')}
-            className={`futuristic-button group ${getAnimClass()}`} 
-            style={{transitionDelay: '500ms'}}
-          >
-            <div className='flex items-center'>
-              <Bot className="w-6 h-6 mr-4 text-blue-300"/>
-              <span className="font-semibold">Chat with my AI assistant</span>
-            </div>
-            <ChevronRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all duration-300"/>
-          </Link>
-          <Link 
-            href="/map" 
-            onClick={() => trackEvent.navigationClick('travel_map')}
-            className={`futuristic-button group ${getAnimClass()}`} 
-            style={{transitionDelay: '600ms'}}
-          >
-            <div className='flex items-center'>
-              <Globe className="w-6 h-6 mr-4 text-blue-300"/>
-              <span className="font-semibold">Explore my travel map</span>
-            </div>
-            <ChevronRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all duration-300"/>
-          </Link>
-        </footer>
-      </main>
+          <footer className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link 
+              href="/chatbot" 
+              onClick={() => trackEvent.navigationClick('chatbot')}
+              className={`futuristic-button group ${getAnimClass()}`} 
+              style={{transitionDelay: '500ms'}}
+            >
+              <div className='flex items-center'>
+                <Bot className="w-6 h-6 mr-4 text-blue-300"/>
+                <span className="font-semibold">Chat with my AI assistant</span>
+              </div>
+              <ChevronRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all duration-300"/>
+            </Link>
+            <Link 
+              href="/map" 
+              onClick={() => trackEvent.navigationClick('travel_map')}
+              className={`futuristic-button group ${getAnimClass()}`} 
+              style={{transitionDelay: '600ms'}}
+            >
+              <div className='flex items-center'>
+                <Globe className="w-6 h-6 mr-4 text-blue-300"/>
+                <span className="font-semibold">Explore my travel map</span>
+              </div>
+              <ChevronRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all duration-300"/>
+            </Link>
+          </footer>
+        </main>
+      </div>
     </div>
   );
 };

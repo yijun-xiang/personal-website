@@ -303,7 +303,7 @@ const InteractiveTravelMap = () => {
               {isMobileMenuOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </button>
             
-            <div className="hidden lg:block w-20"></div>
+            <div className="hidden lg:block w-20" aria-hidden="true"></div>
           </div>
         </div>
       </header>
@@ -368,7 +368,7 @@ const InteractiveTravelMap = () => {
 
           <div className="hidden lg:block lg:col-span-1 bg-gray-900/60 backdrop-blur-xl border-l border-gray-700/30 overflow-y-auto">
             <div className="p-6">
-              <div className="sticky top-0 bg-gray-900/60 backdrop-blur-xl -mx-6 px-6 py-4 border-b border-gray-700/30 mb-6">
+              <div className="mb-6">
                 <h2 className="text-xl font-bold mb-2 flex items-center">
                   <Globe className="w-6 h-6 mr-3 text-blue-400"/>
                   Visited Countries

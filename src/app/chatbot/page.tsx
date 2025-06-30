@@ -359,7 +359,7 @@ const ChatbotPage = () => {
             
             <div className="text-center flex-1 mx-4">
               <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-300 to-blue-300 bg-clip-text text-transparent animate-gradient">
-                Yijun&apos;s AI Assistant
+              Stan AI
               </h1>
               <p className="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:flex items-center justify-center gap-1">
                 <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
@@ -510,7 +510,7 @@ const ChatbotPage = () => {
                 About This AI
               </h3>
               <p className="text-sm text-gray-400 leading-relaxed">
-                A slightly biased AI that happens to think its creator is pretty awesome. It&apos;ll answer your questions... probably with some unnecessary Yijun facts thrown in.
+                A fun experiment where GPT-3.5 meets a quirky personality. This chatbot tries to be helpful while occasionally mentioning how cool its creator is. Results may vary!
               </p>
             </div>
 

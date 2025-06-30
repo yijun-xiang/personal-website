@@ -25,7 +25,7 @@ const ProjectsPage = () => {
           <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-300 to-blue-300 bg-clip-text text-transparent mb-4 leading-tight pt-2">
             My Projects
           </h1>
-          <p className="text-xl text-gray-400">Building AI-powered tools and scalable systems</p>
+          <p className="text-xl text-gray-400">Building ML systems and AI-powered developer tools</p>
         </div>
 
         <div className="space-y-8">
@@ -117,11 +117,11 @@ const ProjectsPage = () => {
             </div>
           </div>
 
-          <div className="bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/50 shadow-lg shadow-purple-500/20">
+          <div className="bg-gray-800/60 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/50 shadow-lg shadow-blue-500/20">
             <div className="flex items-center gap-2 mb-6">
-              <span className="bg-gradient-to-r from-purple-600 to-blue-600 text-xs px-4 py-1 rounded-full font-semibold flex items-center gap-1">
+              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 text-xs px-4 py-1 rounded-full font-semibold flex items-center gap-1">
                 <Star className="w-3 h-3" />
-                FEATURED PROJECT
+                AI/DEVTOOLS PROJECT
               </span>
               <span className="bg-green-500/20 text-green-400 text-xs px-3 py-1 rounded-full font-medium">
                 LIVE
@@ -138,7 +138,7 @@ const ProjectsPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               <div className="flex items-start gap-3">
-                <Code className="w-5 h-5 text-purple-400 mt-1 flex-shrink-0" />
+                <Code className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
                 <div>
                   <h3 className="font-semibold mb-1">Multi-Language Support</h3>
                   <p className="text-sm text-gray-400">Python, JavaScript, TypeScript, Java, Go, Rust, C++</p>
@@ -171,12 +171,12 @@ const ProjectsPage = () => {
             </div>
 
             <div className="flex flex-wrap gap-2 mb-8">
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-sm">FastAPI</span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-sm">Next.js</span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-sm">TypeScript</span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-sm">OpenAI</span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-sm">AWS ECS</span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-sm">Docker</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm">FastAPI</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm">Next.js</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm">TypeScript</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm">OpenAI</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm">AWS ECS</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm">Docker</span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -184,7 +184,7 @@ const ProjectsPage = () => {
                 href="https://code.yijunxiang.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 rounded-lg font-medium hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 rounded-lg font-medium hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
               >
                 Visit Live Demo
                 <ExternalLink className="w-4 h-4" />

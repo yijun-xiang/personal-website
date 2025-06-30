@@ -1,60 +1,133 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const ShootingStar = ({ delay = 0 }: { delay?: number }) => {
-  const ref = useRef<THREE.Mesh>(null);
-  const trailRef = useRef<THREE.Mesh>(null);
+const ShootingStar = ({ delay = 0, index = 0 }: { delay?: number; index?: number }) => {
+  const lineRef = useRef<THREE.Line>(null);
   const time = useRef(delay);
-  const speed = 0.5 + Math.random() * 0.5;
+  const isActive = useRef(false);
+  
+  const startPosition = useMemo(() => {
+    const spread = 40;
+    const height = 15 + Math.random() * 10;
+    return new THREE.Vector3(
+      -spread + Math.random() * spread * 2,
+      height,
+      -10 + Math.random() * 20
+    );
+  }, []);
+  
+  const velocity = useMemo(() => {
+    const speed = 15 + Math.random() * 10;
+    const angle = Math.PI / 4 + (Math.random() - 0.5) * Math.PI / 6;
+    return new THREE.Vector3(
+      Math.cos(angle) * speed,
+      -Math.sin(angle) * speed,
+      0
+    );
+  }, []);
+
+  const geometry = useMemo(() => {
+    const points = [];
+    const tailLength = 20;
+    for (let i = 0; i < tailLength; i++) {
+      points.push(new THREE.Vector3(0, 0, 0));
+    }
+    const geom = new THREE.BufferGeometry().setFromPoints(points);
+    const colors = new Float32Array(tailLength * 3);
+    const sizes = new Float32Array(tailLength);
+    
+    for (let i = 0; i < tailLength; i++) {
+      const intensity = 1 - i / tailLength;
+      colors[i * 3] = 0.9;
+      colors[i * 3 + 1] = 0.95;
+      colors[i * 3 + 2] = 1.0;
+      sizes[i] = intensity;
+    }
+    
+    geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geom.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    
+    return geom;
+  }, []);
 
   useFrame((state, delta) => {
-    if (!ref.current || !trailRef.current) return;
+    if (!lineRef.current) return;
     
-    time.current += delta * speed;
+    time.current += delta;
     
-    const t = (time.current % 3) / 3;
+    if (time.current > 1 && !isActive.current) {
+      isActive.current = true;
+      lineRef.current.visible = true;
+    }
     
-    const startX = -15 + Math.random() * 10;
-    const startY = 10 + Math.random() * 5;
-    const startZ = -5 + Math.random() * 10;
+    if (!isActive.current) {
+      lineRef.current.visible = false;
+      return;
+    }
     
-    const endX = startX + 20;
-    const endY = startY - 15;
-    const endZ = startZ;
+    const progress = time.current - 1;
+    const fadeInOut = progress < 0.1 ? progress * 10 : progress > 1.5 ? Math.max(0, 2 - progress) : 1;
     
-    ref.current.position.x = startX + (endX - startX) * t;
-    ref.current.position.y = startY + (endY - startY) * t;
-    ref.current.position.z = startZ + (endZ - startZ) * t;
+    if (progress > 2) {
+      time.current = -Math.random() * 5 - 2;
+      isActive.current = false;
+      lineRef.current.visible = false;
+      return;
+    }
     
-    trailRef.current.position.copy(ref.current.position);
-    trailRef.current.scale.x = t < 0.1 ? t * 10 : t > 0.9 ? (1 - t) * 10 : 1;
+    const positions = lineRef.current.geometry.attributes.position.array as Float32Array;
+    const tailLength = positions.length / 3;
     
-    const opacity = t < 0.1 ? t * 10 : t > 0.9 ? (1 - t) * 10 : 1;
-    (ref.current.material as THREE.MeshBasicMaterial).opacity = opacity;
-    (trailRef.current.material as THREE.MeshBasicMaterial).opacity = opacity * 0.5;
+    for (let i = 0; i < tailLength; i++) {
+      const t = progress - i * 0.003;
+      if (t > 0) {
+        positions[i * 3] = startPosition.x + velocity.x * t;
+        positions[i * 3 + 1] = startPosition.y + velocity.y * t;
+        positions[i * 3 + 2] = startPosition.z;
+      } else {
+        positions[i * 3] = startPosition.x;
+        positions[i * 3 + 1] = startPosition.y;
+        positions[i * 3 + 2] = startPosition.z;
+      }
+    }
+    
+    lineRef.current.geometry.attributes.position.needsUpdate = true;
+    
+    if (lineRef.current.material instanceof THREE.LineBasicMaterial) {
+      lineRef.current.material.opacity = fadeInOut * 0.8;
+    }
   });
 
   return (
-    <group>
-      <mesh ref={ref}>
+    <>
+      <line ref={lineRef} geometry={geometry}>
+        <lineBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.8}
+          linewidth={2}
+          vertexColors
+        />
+      </line>
+      <mesh position={startPosition}>
         <sphereGeometry args={[0.05, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0}
+        />
       </mesh>
-      <mesh ref={trailRef} rotation={[0, 0, -Math.PI / 4]}>
-        <boxGeometry args={[3, 0.01, 0.01]} />
-        <meshBasicMaterial color="#88bbff" transparent />
-      </mesh>
-    </group>
+    </>
   );
 };
 
 const ShootingStars = () => {
   return (
     <group>
-      {[...Array(5)].map((_, i) => (
-        <ShootingStar key={i} delay={i * 0.6} />
+      {[...Array(8)].map((_, i) => (
+        <ShootingStar key={i} delay={i * 1.5} index={i} />
       ))}
     </group>
   );

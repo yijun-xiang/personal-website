@@ -4,7 +4,6 @@ import { Stars, OrbitControls } from '@react-three/drei';
 import GlobeBackground from './GlobeBackground';
 import ShootingStars from './ShootingStars';
 import ParticleWave from './ParticleWave';
-import AuroraEffect from './AuroraEffect';
 import React from 'react';
 
 class ErrorBoundary extends React.Component<{children: React.ReactNode, fallback: React.ReactNode}, {hasError: boolean}> {
@@ -38,7 +37,6 @@ const Scene = () => {
                     <GlobeBackground />
                     <ShootingStars />
                     <ParticleWave />
-                    <AuroraEffect />
                     <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.2} minPolarAngle={Math.PI/2} maxPolarAngle={Math.PI/2} />
                 </Canvas>
             </div>

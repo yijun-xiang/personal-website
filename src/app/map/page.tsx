@@ -65,12 +65,14 @@ const WorldMap = React.memo(({
   visitedCountryCodes, 
   onCountryClick, 
   onCountryHover, 
-  onCountryLeave 
+  onCountryLeave,
+  highlightedCountryId 
 }: {
   visitedCountryCodes: Set<string>;
   onCountryClick: (geo: GeographyProps) => void;
   onCountryHover: (name: string) => void;
   onCountryLeave: () => void;
+  highlightedCountryId: string | null;
 }) => (
   <Suspense fallback={<MapLoader />}>
     <ComposableMap
@@ -103,6 +105,7 @@ const WorldMap = React.memo(({
         {({ geographies }: GeographiesRenderProps) =>
           geographies.map((geo) => {
             const isVisited = visitedCountryCodes.has(geo.id);
+            const isHighlighted = highlightedCountryId === geo.id;
             
             return (
               <Geography
@@ -113,23 +116,23 @@ const WorldMap = React.memo(({
                 onMouseLeave={onCountryLeave}
                 style={{
                   default: {
-                    fill: isVisited ? "#3b82f6" : "#1e293b",
-                    stroke: isVisited ? "#60a5fa" : "#334155",
-                    strokeWidth: isVisited ? 1.5 : 0.5,
+                    fill: isHighlighted ? "#60a5fa" : (isVisited ? "#3b82f6" : "#1e293b"),
+                    stroke: isHighlighted ? "#93c5fd" : (isVisited ? "#60a5fa" : "#334155"),
+                    strokeWidth: isHighlighted ? 2 : (isVisited ? 1.5 : 0.5),
                     outline: "none",
-                    filter: isVisited ? "url(#glow)" : "none",
+                    filter: (isVisited || isHighlighted) ? "url(#glow)" : "none",
                     transition: "all 0.3s ease",
                   },
                   hover: {
-                    fill: isVisited ? "#60a5fa" : "#374151",
-                    stroke: isVisited ? "#93c5fd" : "#4b5563",
-                    strokeWidth: isVisited ? 2 : 0.75,
+                    fill: isHighlighted ? "#93c5fd" : (isVisited ? "#60a5fa" : "#374151"),
+                    stroke: isHighlighted ? "#bfdbfe" : (isVisited ? "#93c5fd" : "#4b5563"),
+                    strokeWidth: isHighlighted ? 2.5 : (isVisited ? 2 : 0.75),
                     outline: "none",
                     cursor: isVisited ? "pointer" : "default",
-                    filter: isVisited ? "url(#glow)" : "none",
+                    filter: (isVisited || isHighlighted) ? "url(#glow)" : "none",
                   },
                   pressed: {
-                    fill: isVisited ? "#1d4ed8" : "#374151",
+                    fill: isHighlighted ? "#2563eb" : (isVisited ? "#1d4ed8" : "#374151"),
                     outline: "none",
                   },
                 }}
@@ -147,11 +150,13 @@ WorldMap.displayName = 'WorldMap';
 const VirtualizedCountryList = React.memo(({ 
   countries, 
   selectedCountry, 
-  onCountrySelect 
+  onCountrySelect,
+  highlightedCountryId 
 }: {
   countries: VisitedCountry[];
   selectedCountry: VisitedCountry | null;
   onCountrySelect: (country: VisitedCountry) => void;
+  highlightedCountryId: string | null;
 }) => {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
   
@@ -174,12 +179,18 @@ const VirtualizedCountryList = React.memo(({
           key={country.id} 
           className={`group relative bg-gradient-to-r from-gray-800/50 to-gray-700/30 hover:from-blue-900/50 hover:to-purple-900/30 p-3 sm:p-4 rounded-xl border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
             selectedCountry?.id === country.id ? 'ring-2 ring-blue-500/50 bg-gradient-to-r from-blue-900/50 to-purple-900/30' : ''
+          } ${
+            highlightedCountryId === country.id ? 'bg-gradient-to-r from-blue-600/30 to-blue-700/20 border-blue-400/70 shadow-lg shadow-blue-500/30' : ''
           }`}
           onClick={() => onCountrySelect(country)}
         >
           <div className="flex items-center">
-            <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-blue-400 flex-shrink-0"/>
-            <span className="font-semibold text-white group-hover:text-blue-300 transition-colors text-sm sm:text-base">
+            <MapPin className={`w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0 transition-colors ${
+              highlightedCountryId === country.id ? 'text-blue-300' : 'text-blue-400'
+            }`}/>
+            <span className={`font-semibold text-white group-hover:text-blue-300 transition-colors text-sm sm:text-base ${
+              highlightedCountryId === country.id ? 'text-blue-200' : ''
+            }`}>
               {country.name}
             </span>
           </div>
@@ -204,6 +215,7 @@ const InteractiveTravelMap = () => {
   const [selectedCountry, setSelectedCountry] = useState<VisitedCountry | null>(null);
   const [hoveredCountry, setHoveredCountry] = useState<string>("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [highlightedCountryId, setHighlightedCountryId] = useState<string | null>(null);
 
   const visitedCountryCodes = useMemo(
     () => new Set(visitedCountries.map(c => c.id)), 
@@ -223,11 +235,16 @@ const InteractiveTravelMap = () => {
     const country = visitedCountries.find(c => c.id === geo.id);
     if (country) {
       setSelectedCountry(country);
+      if (highlightedCountryId === country.id) {
+        setHighlightedCountryId(null);
+      } else {
+        setHighlightedCountryId(country.id);
+      }
       if (window.innerWidth < 1024) {
         setIsMobileMenuOpen(true);
       }
     }
-  }, []);
+  }, [highlightedCountryId]);
 
   const handleCountryHover = useCallback((name: string) => {
     setHoveredCountry(name);
@@ -239,7 +256,12 @@ const InteractiveTravelMap = () => {
 
   const handleCountrySelect = useCallback((country: VisitedCountry) => {
     setSelectedCountry(country);
-  }, []);
+    if (highlightedCountryId === country.id) {
+      setHighlightedCountryId(null);
+    } else {
+      setHighlightedCountryId(country.id);
+    }
+  }, [highlightedCountryId]);
 
   const isCountryVisited = useCallback((countryName: string) => {
     return visitedCountries.some(country => 
@@ -291,14 +313,18 @@ const InteractiveTravelMap = () => {
           isMobileMenuOpen ? 'max-h-96' : 'max-h-0'
         }`}>
           <div className="bg-gray-900/90 backdrop-blur-xl border-b border-gray-700/30 p-4 max-h-96 overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <Globe className="w-5 h-5 mr-2 text-blue-400"/>
-              Visited Countries ({visitedCountries.length})
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold flex items-center">
+                <Globe className="w-5 h-5 mr-2 text-blue-400"/>
+                Visited Countries ({visitedCountries.length})
+              </h3>
+              <span className="text-xs text-gray-400">Tap to highlight</span>
+            </div>
             <VirtualizedCountryList
               countries={sortedCountries}
               selectedCountry={selectedCountry}
               onCountrySelect={handleCountrySelect}
+              highlightedCountryId={highlightedCountryId}
             />
           </div>
         </div>
@@ -310,6 +336,7 @@ const InteractiveTravelMap = () => {
               onCountryClick={handleCountryClick}
               onCountryHover={handleCountryHover}
               onCountryLeave={handleCountryLeave}
+              highlightedCountryId={highlightedCountryId}
             />
             
             {hoveredCountry && (
@@ -348,6 +375,7 @@ const InteractiveTravelMap = () => {
                 </h2>
                 <p className="text-gray-400 text-sm leading-relaxed">
                   Each destination has shaped my perspective on technology, culture, and innovation.
+                  Click any country name to highlight it on the map.
                 </p>
               </div>
               
@@ -355,6 +383,7 @@ const InteractiveTravelMap = () => {
                 countries={sortedCountries}
                 selectedCountry={selectedCountry}
                 onCountrySelect={handleCountrySelect}
+                highlightedCountryId={highlightedCountryId}
               />
             </div>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Send, Bot, User, RefreshCw, Trash2, Sparkles, MessageCircle, Zap, Menu, X, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Send, Bot, User, RefreshCw, Trash2, Sparkles, MessageCircle, Zap, AlertCircle, Brain, Star } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -29,8 +29,8 @@ const MessageBubbleComponent = ({ message, index }: { message: Message; index: n
       <div
         className={`px-4 sm:px-6 py-3 sm:py-4 rounded-2xl relative overflow-hidden backdrop-blur-lg border transition-all duration-300 ${
           message.isUser
-            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white border-blue-500/30 shadow-lg shadow-blue-500/20'
-            : 'bg-gray-800/60 text-gray-100 border-gray-700/50 hover:border-gray-600/50'
+            ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white border-indigo-500/30 shadow-lg shadow-indigo-500/20'
+            : 'bg-gray-900/80 text-gray-100 border-gray-700/50 hover:border-gray-600/50'
         }`}
       >
         {message.isUser && (
@@ -41,11 +41,11 @@ const MessageBubbleComponent = ({ message, index }: { message: Message; index: n
           {!message.isUser && (
             <div className="flex-shrink-0 mt-1">
               {message.isLoading ? (
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 p-1.5 sm:p-2 animate-pulse">
-                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 p-1.5 sm:p-2 animate-pulse">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white animate-spin" />
                 </div>
               ) : (
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 p-1.5 sm:p-2">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 p-1.5 sm:p-2 shadow-lg shadow-cyan-500/30">
                   <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
               )}
@@ -56,16 +56,16 @@ const MessageBubbleComponent = ({ message, index }: { message: Message; index: n
             {message.isLoading ? (
               <div className="flex items-center space-x-3">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-100"></div>
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-200"></div>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
                 </div>
-                <span className="text-xs sm:text-sm text-gray-400">AI is thinking...</span>
+                <span className="text-xs sm:text-sm text-gray-400">Yijun&apos;s AI is thinking...</span>
               </div>
             ) : (
               <div>
                 <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
-                <p className="text-xs opacity-60 mt-2 flex items-center space-x-1">
+                <p className="text-xs opacity-50 mt-2 flex items-center space-x-1">
                   <span>{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   {message.isUser && <span className="ml-2">✓</span>}
                 </p>
@@ -75,7 +75,7 @@ const MessageBubbleComponent = ({ message, index }: { message: Message; index: n
           
           {message.isUser && (
             <div className="flex-shrink-0 mt-1">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-gray-600 to-gray-700 p-1.5 sm:p-2">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 p-1.5 sm:p-2 shadow-lg shadow-indigo-500/30">
                 <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
             </div>
@@ -127,7 +127,6 @@ const ChatbotPage = () => {
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [messageCount, setMessageCount] = useState<MessageCount>({ count: 0, resetTime: Date.now() + 86400000 });
   const [serverRemaining, setServerRemaining] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
@@ -325,13 +324,13 @@ const ChatbotPage = () => {
 
   const getLimitMessage = () => {
     if (remainingToday <= 0) {
-      return "You've exhausted your daily Yijun wisdom! Come back tomorrow! 🌅";
+      return "Daily limit reached! Come back tomorrow for more wisdom!";
     } else if (remainingToday <= 5) {
-      return `Only ${remainingToday} questions left today! Use them wisely to learn about the legend! 🎯`;
+      return `Only ${remainingToday} questions left today!`;
     } else if (remainingToday <= 10) {
-      return `${remainingToday} Yijun insights remaining today. Better make them count! 💎`;
+      return `${remainingToday} questions remaining today`;
     } else {
-      return `${remainingToday} questions left today to discover Yijun's greatness! 🚀`;
+      return `${remainingToday} questions left today`;
     }
   };
 
@@ -340,10 +339,9 @@ const ChatbotPage = () => {
       isPageLoaded ? 'opacity-100' : 'opacity-0'
     }`}>
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.1),transparent_50%)]"></div>
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.15),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.15),transparent_50%)]"></div>
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
       </div>
 
       <header className={`relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 shadow-2xl transition-all duration-700 ${
@@ -352,18 +350,21 @@ const ChatbotPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
-              <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-blue-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/20">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-purple-600/0 group-hover:from-blue-600/20 group-hover:to-purple-600/20 rounded-xl transition-all duration-300"></div>
+              <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-cyan-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cyan-500/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/0 to-blue-600/0 group-hover:from-cyan-600/20 group-hover:to-blue-600/20 rounded-xl transition-all duration-300"></div>
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
               </div>
-              <span className="font-medium text-sm sm:text-base group-hover:text-blue-300 transition-colors duration-300">Back to Home</span>
+              <span className="font-medium text-sm sm:text-base group-hover:text-cyan-300 transition-colors duration-300">Back to Home</span>
             </Link>
             
             <div className="text-center flex-1 mx-4">
-              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-blue-300 to-purple-300 bg-clip-text text-transparent animate-gradient">
-                AI Assistant
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-300 to-blue-300 bg-clip-text text-transparent animate-gradient">
+                Yijun&apos;s AI Assistant
               </h1>
-              <p className="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">Powered by GPT • Online</p>
+              <p className="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:flex items-center justify-center gap-1">
+                <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                Powered by GPT • Online
+              </p>
             </div>
             
             <div className="flex items-center justify-end space-x-2">
@@ -374,150 +375,171 @@ const ChatbotPage = () => {
               >
                 <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
               </button>
-              
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="sm:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-500/20 rounded-lg transition-all duration-300"
-              >
-                {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-30 sm:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
-          <div className="absolute top-16 right-4 bg-gray-900/95 backdrop-blur-xl rounded-xl border border-gray-700/50 p-4 min-w-[200px] shadow-2xl">
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  clearChat();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center space-x-2 w-full p-2 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span className="text-sm">Clear Chat</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className={`flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6 flex flex-col relative z-10 transition-all duration-700 ${
+      <div className={`flex-1 max-w-7xl mx-auto w-full flex gap-6 px-4 sm:px-6 py-4 sm:py-6 relative z-10 transition-all duration-700 ${
         isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
       }`} style={{ transitionDelay: '200ms' }}>
-        <div className={`mb-3 bg-gradient-to-r ${remainingToday <= 5 ? 'from-red-900/30 to-orange-900/30' : remainingToday <= 10 ? 'from-yellow-900/30 to-orange-900/30' : 'from-blue-900/30 to-purple-900/30'} backdrop-blur-sm rounded-lg p-3 border ${remainingToday <= 5 ? 'border-red-700/50' : remainingToday <= 10 ? 'border-yellow-700/50' : 'border-blue-700/50'} flex items-center justify-between`}>
-          <div className="flex items-center space-x-2">
-            <AlertCircle className={`w-4 h-4 ${remainingToday <= 5 ? 'text-red-400' : remainingToday <= 10 ? 'text-yellow-400' : 'text-blue-400'}`} />
-            <span className="text-sm">{getLimitMessage()}</span>
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className={`mb-3 bg-gradient-to-r ${remainingToday <= 5 ? 'from-red-900/20 to-orange-900/20' : remainingToday <= 10 ? 'from-yellow-900/20 to-orange-900/20' : 'from-cyan-900/20 to-blue-900/20'} backdrop-blur-sm rounded-xl p-3 border ${remainingToday <= 5 ? 'border-red-700/30' : remainingToday <= 10 ? 'border-yellow-700/30' : 'border-cyan-700/30'} flex items-center justify-between`}>
+            <div className="flex items-center space-x-2">
+              <div className={`p-1.5 rounded-lg ${remainingToday <= 5 ? 'bg-red-500/20' : remainingToday <= 10 ? 'bg-yellow-500/20' : 'bg-cyan-500/20'}`}>
+                <AlertCircle className={`w-4 h-4 ${remainingToday <= 5 ? 'text-red-400' : remainingToday <= 10 ? 'text-yellow-400' : 'text-cyan-400'}`} />
+              </div>
+              <span className="text-sm font-medium">{getLimitMessage()}</span>
+            </div>
+            {serverRemaining !== null && (
+              <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded-lg">API: {serverRemaining}/hr</span>
+            )}
           </div>
-          {serverRemaining !== null && (
-            <span className="text-xs text-gray-400">({serverRemaining}/hr server limit)</span>
-          )}
-        </div>
 
-        <div 
-          ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-4 sm:mb-6 min-h-0 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
-        >
-          {hasMoreAbove && (
-            <div className="text-center py-2">
-              <span className="text-xs text-gray-500">Showing recent messages</span>
-            </div>
-          )}
-          
-          <Suspense fallback={<div className="text-center text-gray-400">Loading messages...</div>}>
-            {visibleMessages.map((message, index) => (
-              <MessageBubble key={message.id} message={message} index={index} />
-            ))}
-          </Suspense>
-          <div ref={messagesEndRef} />
-        </div>
-
-        {messages.length <= 2 && (
-          <div className={`mb-4 sm:mb-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-500 transition-all ${
-            isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-          }`} style={{ transitionDelay: '300ms' }}>
-            <div className="text-center mb-3 sm:mb-4">
-              <p className="text-xs sm:text-sm text-gray-400 mb-3 flex items-center justify-center space-x-2">
-                <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Try asking:</span>
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-              {suggestedQuestions.map((question, index) => (
-                <button
-                  key={question.text}
-                  onClick={() => handleSuggestionClick(question.text)}
-                  className="group p-3 sm:p-4 bg-gray-800/40 hover:bg-gray-700/60 border border-gray-700/50 hover:border-blue-500/50 rounded-xl transition-all duration-300 text-left hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/10"
-                  style={{ animationDelay: `${index * 100 + 600}ms` }}
-                  disabled={remainingToday <= 0}
-                >
-                  <div className='flex items-center space-x-2 sm:space-x-3'>
-                    <span className="text-lg sm:text-2xl">{question.icon}</span>
-                    <span className="text-xs sm:text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
-                      {question.text}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className={`relative transition-all duration-700 ${
-          isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`} style={{ transitionDelay: '400ms' }}>
-          <div className="flex items-center space-x-2 sm:space-x-4 bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xl">
-            <div className="flex-1 relative">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={remainingToday > 0 ? "Ask me anything about Yijun..." : "Daily limit reached! Come back tomorrow!"}
-                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 text-sm resize-none pr-14"
-                disabled={isLoading || remainingToday <= 0}
-                maxLength={500}
-              />
-              {characterCount > 0 && (
-                <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  <div className={`text-xs ${isOverLimit ? 'text-red-400' : 'text-gray-500'}`}>
-                    {characterCount}/500
-                  </div>
-                </div>
-              )}
-            </div>
+          <div 
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-4 sm:mb-6 min-h-0 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent bg-gray-800/10 rounded-xl p-4 border border-gray-700/20"
+          >
+            {hasMoreAbove && (
+              <div className="text-center py-2">
+                <span className="text-xs text-gray-500 bg-gray-800/30 px-3 py-1 rounded-full">Showing recent messages</span>
+              </div>
+            )}
             
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputText.trim() || isLoading || isOverLimit || remainingToday <= 0}
-              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg disabled:shadow-none hover:shadow-blue-500/25 hover:scale-105 disabled:scale-100"
-            >
-              <div className="flex items-center space-x-1 sm:space-x-2">
-                {isLoading ? (
-                  <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" />
+            <Suspense fallback={<div className="text-center text-gray-400">Loading messages...</div>}>
+              {visibleMessages.map((message, index) => (
+                <MessageBubble key={message.id} message={message} index={index} />
+              ))}
+            </Suspense>
+            <div ref={messagesEndRef} />
+          </div>
+
+          {messages.length <= 2 && (
+            <div className={`mb-4 sm:mb-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-500 transition-all ${
+              isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`} style={{ transitionDelay: '300ms' }}>
+              <div className="text-center mb-3 sm:mb-4">
+                <p className="text-xs sm:text-sm text-gray-400 mb-3 flex items-center justify-center space-x-2">
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400" />
+                  <span>Quick questions to get started:</span>
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                {suggestedQuestions.map((question, index) => (
+                  <button
+                    key={question.text}
+                    onClick={() => handleSuggestionClick(question.text)}
+                    className="group p-3 sm:p-4 bg-gray-800/60 hover:bg-gray-700/80 border border-gray-700/50 hover:border-cyan-500/50 rounded-xl transition-all duration-300 text-left hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/10"
+                    style={{ animationDelay: `${index * 100 + 600}ms` }}
+                    disabled={remainingToday <= 0}
+                  >
+                    <div className='flex items-center space-x-2 sm:space-x-3'>
+                      <span className="text-lg sm:text-2xl">{question.icon}</span>
+                      <span className="text-xs sm:text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
+                        {question.text}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className={`relative transition-all duration-700 ${
+            isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          }`} style={{ transitionDelay: '400ms' }}>
+            <div className="flex items-center space-x-2 sm:space-x-4 bg-gray-900/60 backdrop-blur-xl border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xl hover:border-cyan-500/30 transition-all duration-300">
+              <div className="flex-1 relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={remainingToday > 0 ? "Ask me anything about Yijun..." : "Daily limit reached! Come back tomorrow!"}
+                  className="w-full bg-transparent border-none outline-none text-white placeholder-gray-500 text-sm resize-none pr-14 focus:placeholder-gray-600 transition-colors"
+                  disabled={isLoading || remainingToday <= 0}
+                  maxLength={500}
+                />
+                {characterCount > 0 && (
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                    <div className={`text-xs ${isOverLimit ? 'text-red-400' : characterCount > 400 ? 'text-yellow-400' : 'text-gray-500'}`}>
+                      {characterCount}/500
+                    </div>
+                  </div>
                 )}
-                <span className="font-medium hidden sm:block">Send</span>
               </div>
               
-              {!isLoading && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity rounded-lg sm:rounded-xl"></div>
-              )}
-            </button>
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputText.trim() || isLoading || isOverLimit || remainingToday <= 0}
+                className="group relative bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg disabled:shadow-none hover:shadow-cyan-500/25 hover:scale-105 disabled:scale-100"
+              >
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  {isLoading ? (
+                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  )}
+                  <span className="font-medium hidden sm:block">Send</span>
+                </div>
+                
+                {!isLoading && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity rounded-lg sm:rounded-xl"></div>
+                )}
+              </button>
+            </div>
+            
+            <div className="text-center mt-3 sm:mt-4">
+              <div className="inline-flex items-center space-x-2 text-xs text-gray-500 bg-gray-800/30 backdrop-blur-sm px-3 py-1 rounded-full">
+                <MessageCircle className="w-3 h-3" />
+                <span>Powered by OpenAI GPT-3.5</span>
+                <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+              </div>
+            </div>
           </div>
-          
-          <div className="text-center mt-3 sm:mt-4">
-            <div className="inline-flex items-center space-x-2 text-xs text-gray-500 bg-gray-800/30 backdrop-blur-sm px-3 py-1 rounded-full">
-              <MessageCircle className="w-3 h-3" />
-              <span>Powered by OpenAI GPT</span>
-              <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+        </div>
+
+        <div className={`hidden lg:block w-80 transition-all duration-700 ${
+          isPageLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
+        }`} style={{ transitionDelay: '300ms' }}>
+          <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/30 p-6 space-y-6">
+            <div>
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Brain className="w-5 h-5 text-cyan-400" />
+                About This AI
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                A slightly biased AI that happens to think its creator is pretty awesome. It&apos;ll answer your questions... probably with some unnecessary Yijun facts thrown in.
+              </p>
+            </div>
+
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+
+            <div>
+              <h4 className="text-sm font-semibold mb-3 text-gray-300">Features</h4>
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <Star className="w-4 h-4 text-yellow-400 mt-0.5" />
+                  <p className="text-xs text-gray-400">Hilariously biased towards Yijun</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Zap className="w-4 h-4 text-cyan-400 mt-0.5" />
+                  <p className="text-xs text-gray-400">Lightning-fast responses</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Brain className="w-4 h-4 text-purple-400 mt-0.5" />
+                  <p className="text-xs text-gray-400">Answers on any topic</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+
+            <div className="text-center">
+              <p className="text-xs text-gray-500">
+                Built with love (and bias) by Yijun
+              </p>
             </div>
           </div>
         </div>

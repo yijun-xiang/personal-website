@@ -23,13 +23,20 @@ const ProjectsPage = () => {
         isLoaded ? 'translate-y-0' : '-translate-y-4'
       }`} style={{ transitionDelay: '100ms' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <Link href="/" className="group inline-flex items-center space-x-3 text-gray-300 hover:text-white transition-all">
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-purple-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-blue-600/0 group-hover:from-purple-600/20 group-hover:to-blue-600/20 rounded-xl transition-all duration-300"></div>
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+          <div className="relative flex items-center justify-center">
+            <Link href="/" className="absolute left-0 group inline-flex items-center space-x-3 text-gray-300 hover:text-white transition-all">
+              <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-purple-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-blue-600/0 group-hover:from-purple-600/20 group-hover:to-blue-600/20 rounded-xl transition-all duration-300"></div>
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+              </div>
+            </Link>
+            
+            <div className="text-center">
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-purple-300 to-blue-300 bg-clip-text text-transparent animate-gradient">
+                Projects
+              </h1>
             </div>
-            <span className="font-medium group-hover:text-purple-300 transition-colors duration-300">Back to Home</span>
-          </Link>
+          </div>
         </div>
       </header>
 
@@ -37,10 +44,31 @@ const ProjectsPage = () => {
         <div className={`text-center mb-12 transition-all duration-700 ${
           isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
         }`} style={{ transitionDelay: '200ms' }}>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-300 to-blue-300 bg-clip-text text-transparent mb-4 leading-tight pt-2">
-            My Projects
-          </h1>
-          <p className="text-xl text-gray-400">Building ML systems and AI-powered developer tools</p>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent w-20"></div>
+            <p className="text-purple-400 font-semibold tracking-wide uppercase text-sm">Featured Work</p>
+            <div className="h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent w-20"></div>
+          </div>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Building production-ready ML systems and AI-powered developer tools. 
+            Each project showcases real-world applications of cutting-edge technologies.
+          </p>
+          <div className="flex items-center justify-center gap-6 sm:gap-8 mt-8">
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-purple-400">2+</div>
+              <div className="text-xs sm:text-sm text-gray-500">Live Projects</div>
+            </div>
+            <div className="w-px h-10 sm:h-12 bg-gray-700"></div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-400">10+</div>
+              <div className="text-xs sm:text-sm text-gray-500">Technologies</div>
+            </div>
+            <div className="w-px h-10 sm:h-12 bg-gray-700"></div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-400">100%</div>
+              <div className="text-xs sm:text-sm text-gray-500">Open Source</div>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-8">

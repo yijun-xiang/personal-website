@@ -23,13 +23,20 @@ const ResearchPage = () => {
         isLoaded ? 'translate-y-0' : '-translate-y-4'
       }`} style={{ transitionDelay: '100ms' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <Link href="/" className="group inline-flex items-center space-x-3 text-gray-300 hover:text-white transition-all">
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-green-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-green-500/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-600/0 to-blue-600/0 group-hover:from-green-600/20 group-hover:to-blue-600/20 rounded-xl transition-all duration-300"></div>
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+          <div className="relative flex items-center justify-center">
+            <Link href="/" className="absolute left-0 group inline-flex items-center space-x-3 text-gray-300 hover:text-white transition-all">
+              <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-green-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-green-500/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-600/0 to-blue-600/0 group-hover:from-green-600/20 group-hover:to-blue-600/20 rounded-xl transition-all duration-300"></div>
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+              </div>
+            </Link>
+            
+            <div className="text-center">
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-green-300 to-blue-300 bg-clip-text text-transparent animate-gradient">
+                Research
+              </h1>
             </div>
-            <span className="font-medium group-hover:text-green-300 transition-colors duration-300">Back to Home</span>
-          </Link>
+          </div>
         </div>
       </header>
 
@@ -42,10 +49,10 @@ const ResearchPage = () => {
             <Sparkles className="w-8 h-8 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
           </div>
           
-          <h1 className={`text-5xl font-bold bg-gradient-to-r from-white via-green-300 to-blue-300 bg-clip-text text-transparent mb-6 transition-all duration-700 ${
+          <h1 className={`text-4xl sm:text-5xl font-bold bg-gradient-to-r from-white via-green-300 to-blue-300 bg-clip-text text-transparent mb-6 transition-all duration-700 ${
             isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`} style={{ transitionDelay: '300ms' }}>
-            Research Page Coming Soon
+            Coming Soon
           </h1>
           
           <p className={`text-xl text-gray-300 mb-8 leading-relaxed transition-all duration-700 ${

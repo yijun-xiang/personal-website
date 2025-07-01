@@ -288,18 +288,17 @@ const InteractiveTravelMap = () => {
         isLoaded ? 'translate-y-0' : '-translate-y-4'
       }`} style={{ transitionDelay: '100ms' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
+          <div className="relative flex items-center justify-center">
+            <Link href="/" className="absolute left-0 group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
               <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-blue-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/20">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-purple-600/0 group-hover:from-blue-600/20 group-hover:to-purple-600/20 rounded-xl transition-all duration-300"></div>
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
               </div>
-              <span className="font-medium text-sm sm:text-base group-hover:text-blue-300 transition-colors duration-300">Back to Home</span>
             </Link>
             
-            <div className="text-center flex-1 mx-4">
+            <div className="text-center">
               <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-blue-300 to-purple-300 bg-clip-text text-transparent animate-gradient">
-                My Travel Footprint
+                Travel Map
               </h1>
               <p className="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">
                 Exploring {visitedCountries.length} countries across the globe
@@ -308,12 +307,10 @@ const InteractiveTravelMap = () => {
             
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg bg-gray-800/50 hover:bg-blue-500/20 transition-all duration-300"
+              className="absolute right-0 lg:hidden p-2 rounded-lg bg-gray-800/50 hover:bg-blue-500/20 transition-all duration-300"
             >
               {isMobileMenuOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </button>
-            
-            <div className="hidden lg:block w-20" aria-hidden="true"></div>
           </div>
         </div>
       </header>

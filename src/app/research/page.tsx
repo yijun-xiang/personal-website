@@ -49,10 +49,12 @@ const ResearchPage = () => {
             <Sparkles className="w-8 h-8 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
           </div>
           
-          <h1 className={`text-4xl sm:text-5xl font-bold bg-gradient-to-r from-white via-green-300 to-blue-300 bg-clip-text text-transparent mb-6 transition-all duration-700 ${
+          <h1 className={`text-4xl sm:text-5xl font-bold mb-6 transition-all duration-700 leading-tight pb-2 ${
             isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`} style={{ transitionDelay: '300ms' }}>
-            Coming Soon
+            <span className="bg-gradient-to-r from-white via-green-300 to-blue-300 bg-clip-text text-transparent inline-block">
+              Coming Soon
+            </span>
           </h1>
           
           <p className={`text-xl text-gray-300 mb-8 leading-relaxed transition-all duration-700 ${

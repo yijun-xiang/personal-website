@@ -140,15 +140,13 @@ const ProjectsPage = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="https://image-search.yijunxiang.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 rounded-lg font-medium hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
+              <button
+                onClick={() => window.location.href = 'http://image-search.yijunxiang.com'}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 rounded-lg font-medium hover:scale-105 transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 Visit Live Demo
                 <ExternalLink className="w-4 h-4" />
-              </a>
+              </button>
               
               <a
                 href="https://github.com/yijun-xiang/image-similarity-engine"
@@ -227,15 +225,13 @@ const ProjectsPage = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="https://code.yijunxiang.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 rounded-lg font-medium hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
+              <button
+                onClick={() => window.location.href = 'http://code.yijunxiang.com'}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 rounded-lg font-medium hover:scale-105 transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 Visit Live Demo
                 <ExternalLink className="w-4 h-4" />
-              </a>
+              </button>
               
               <a
                 href="https://github.com/yijun-xiang/ai-code-review-assistant"

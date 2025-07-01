@@ -3,7 +3,7 @@ export const personalInfo = {
   title: "AI Developer & Researcher",
   mission: "I build intelligent systems to solve human-centric problems, with a focus on education and technological innovation.",
   email: "yijun.x@berkeley.edu",
-  linkedin: "https://linkedin.com/in/yijun-x-7287a1228",
+  linkedin: "https://linkedin.com/in/yijunxiang",
   github: "https://github.com/yijun-xiang",
   university: "University of California, Berkeley",
   degree: "B.A. in Computer Science & Applied Mathematics",

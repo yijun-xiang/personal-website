@@ -12,17 +12,21 @@ export const metadata: Metadata = {
   description: "AI Developer & Researcher - Building intelligent systems to solve human-centric problems",
   keywords: ["AI", "Machine Learning", "Software Engineer", "UC Berkeley", "Computer Science"],
   authors: [{ name: "Yijun Xiang" }],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
   openGraph: {
     title: "Yijun Xiang",
     description: "AI Developer & Researcher specializing in intelligent systems and human-centric AI solutions",
     url: "https://yijunxiang.com",
     siteName: "Yijun Xiang",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Yijun Xiang",
-    description: "AI Developer & Researcher - Building intelligent systems to solve human-centric problems",
   },
 };
 

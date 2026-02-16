@@ -73,9 +73,6 @@ const FloatingMenu = () => {
                   <div className="font-bold text-base bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent whitespace-nowrap">
                     My Research
                   </div>
-                  <div className="text-xs text-green-400/70 mt-0.5">
-                    coming soon
-                  </div>
                 </div>
               </div>
               

@@ -1,7 +1,6 @@
 'use client';
 import { Canvas } from '@react-three/fiber';
 import { Stars, OrbitControls } from '@react-three/drei';
-import GlobeBackground from './GlobeBackground';
 import ShootingStars from './ShootingStars';
 import ParticleWave from './ParticleWave';
 import React from 'react';
@@ -34,7 +33,6 @@ const Scene = () => {
                     <pointLight color="#ff6b6b" position={[-10, -10, -10]} intensity={0.5} />
                     <pointLight color="#bb86fc" position={[0, 15, 0]} intensity={0.3} />
                     <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-                    <GlobeBackground />
                     <ShootingStars />
                     <ParticleWave />
                     <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.2} minPolarAngle={Math.PI/2} maxPolarAngle={Math.PI/2} />

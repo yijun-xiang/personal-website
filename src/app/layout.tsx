@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Yijun Xiang" }],
   icons: {
     icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
@@ -27,6 +28,14 @@ export const metadata: Metadata = {
     url: "https://yijunxiang.com",
     siteName: "Yijun Xiang",
     type: "website",
+    images: [
+      {
+        url: '/og-avatar.png',
+        width: 512,
+        height: 512,
+        alt: 'Yijun Xiang',
+      },
+    ],
   },
 };
 

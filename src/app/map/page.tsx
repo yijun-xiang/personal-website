@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo, useCallback, lazy, Suspense, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, X, Plane, MapPin } from 'lucide-react';
 
 const ComposableMap = lazy(() => import('react-simple-maps').then(module => ({ default: module.ComposableMap })));
 const Geographies = lazy(() => import('react-simple-maps').then(module => ({ default: module.Geographies })));
@@ -12,6 +12,7 @@ const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 interface VisitedCountry {
   id: string;
   name: string;
+  region: string;
 }
 
 interface GeographyProps {
@@ -27,112 +28,142 @@ interface GeographiesRenderProps {
 }
 
 const visitedCountries: VisitedCountry[] = [
-  { id: "826", name: "United Kingdom" },
-  { id: "352", name: "Iceland" },
-  { id: "250", name: "France" },
-  { id: "756", name: "Switzerland" },
-  { id: "392", name: "Japan" },
-  { id: "410", name: "South Korea" },
-  { id: "156", name: "China" },
-  { id: "372", name: "Ireland" },
-  { id: "492", name: "Monaco" },
-  { id: "056", name: "Belgium" },
-  { id: "528", name: "Netherlands" },
-  { id: "380", name: "Italy" },
-  { id: "336", name: "Vatican City" },
-  { id: "300", name: "Greece" },
-  { id: "276", name: "Germany" },
-  { id: "724", name: "Spain" },
-  { id: "620", name: "Portugal" },
-  { id: "702", name: "Singapore" },
-  { id: "784", name: "United Arab Emirates" },
-  { id: "124", name: "Canada" },
-  { id: "414", name: "Kuwait" },
-  { id: "682", name: "Saudi Arabia" },
-  { id: "840", name: "United States" },
+  { id: "826", name: "United Kingdom", region: "Europe" },
+  { id: "352", name: "Iceland", region: "Europe" },
+  { id: "250", name: "France", region: "Europe" },
+  { id: "756", name: "Switzerland", region: "Europe" },
+  { id: "392", name: "Japan", region: "Asia" },
+  { id: "410", name: "South Korea", region: "Asia" },
+  { id: "156", name: "China", region: "Asia" },
+  { id: "372", name: "Ireland", region: "Europe" },
+  { id: "492", name: "Monaco", region: "Europe" },
+  { id: "056", name: "Belgium", region: "Europe" },
+  { id: "528", name: "Netherlands", region: "Europe" },
+  { id: "380", name: "Italy", region: "Europe" },
+  { id: "336", name: "Vatican City", region: "Europe" },
+  { id: "300", name: "Greece", region: "Europe" },
+  { id: "276", name: "Germany", region: "Europe" },
+  { id: "724", name: "Spain", region: "Europe" },
+  { id: "620", name: "Portugal", region: "Europe" },
+  { id: "702", name: "Singapore", region: "Asia" },
+  { id: "158", name: "Taiwan", region: "Asia" },
+  { id: "608", name: "Philippines", region: "Asia" },
+  { id: "784", name: "United Arab Emirates", region: "Middle East" },
+  { id: "124", name: "Canada", region: "North America" },
+  { id: "414", name: "Kuwait", region: "Middle East" },
+  { id: "682", name: "Saudi Arabia", region: "Middle East" },
+  { id: "840", name: "United States", region: "North America" },
 ];
 
 const MapLoader = () => (
-  <div className="w-full h-full flex items-center justify-center bg-gray-800/30">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-      <p className="text-gray-400">Loading world map...</p>
+  <div className="absolute inset-0 flex items-center justify-center">
+    <div className="relative">
+      <div className="w-20 h-20 border-2 border-cyan-500/20 rounded-full"></div>
+      <div className="absolute inset-0 w-20 h-20 border-2 border-transparent border-t-cyan-400 rounded-full animate-spin"></div>
+      <Plane className="absolute inset-0 m-auto w-8 h-8 text-cyan-400" />
     </div>
   </div>
 );
 
-const WorldMap = React.memo(({ 
-  visitedCountryCodes, 
-  onCountryClick, 
-  onCountryHover, 
+const WorldMap = React.memo(({
+  visitedCountryCodes,
+  onCountryClick,
+  onCountryHover,
   onCountryLeave,
-  highlightedCountryId 
+  highlightedCountryId
 }: {
   visitedCountryCodes: Set<string>;
   onCountryClick: (geo: GeographyProps) => void;
-  onCountryHover: (name: string) => void;
+  onCountryHover: (name: string, isVisited: boolean) => void;
   onCountryLeave: () => void;
   highlightedCountryId: string | null;
 }) => (
   <Suspense fallback={<MapLoader />}>
     <ComposableMap
       projectionConfig={{
-        rotate: [0, 0, 0],
-        scale: 180
+        rotate: [-10, 0, 0],
+        scale: 147
       }}
       style={{ width: "100%", height: "100%" }}
-      viewBox="0 0 800 400"
+      viewBox="0 0 800 500"
     >
       <defs>
+        <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#030712" />
+          <stop offset="100%" stopColor="#030712" />
+        </linearGradient>
         <linearGradient id="visitedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#60a5fa" />
-          <stop offset="100%" stopColor="#3b82f6" />
+          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="50%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#8b5cf6" />
         </linearGradient>
-        <linearGradient id="visitedGradientHover" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#93c5fd" />
-          <stop offset="100%" stopColor="#60a5fa" />
+        <linearGradient id="highlightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#22d3ee" />
+          <stop offset="100%" stopColor="#a78bfa" />
         </linearGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-          <feMerge> 
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
       </defs>
-      
+
+      <rect x="0" y="0" width="800" height="500" fill="url(#oceanGradient)" />
+
       <Geographies geography={geoUrl}>
         {({ geographies }: GeographiesRenderProps) =>
           geographies.map((geo) => {
             const isVisited = visitedCountryCodes.has(geo.id);
             const isHighlighted = highlightedCountryId === geo.id;
-            
+
             return (
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
                 onClick={() => onCountryClick(geo)}
-                onMouseEnter={() => onCountryHover(geo.properties.name)}
+                onMouseEnter={() => onCountryHover(geo.properties.name, isVisited)}
                 onMouseLeave={onCountryLeave}
                 style={{
                   default: {
-                    fill: isHighlighted ? "#93c5fd" : (isVisited ? "url(#visitedGradient)" : "#1e293b"),
-                    stroke: isHighlighted ? "#dbeafe" : (isVisited ? "#93c5fd" : "#475569"),
-                    strokeWidth: isHighlighted ? 2.5 : (isVisited ? 1.5 : 0.75),
+                    fill: isHighlighted
+                      ? "url(#highlightGradient)"
+                      : isVisited
+                        ? "url(#visitedGradient)"
+                        : "#1e293b",
+                    stroke: isHighlighted
+                      ? "#67e8f9"
+                      : isVisited
+                        ? "#0ea5e9"
+                        : "#334155",
+                    strokeWidth: isHighlighted ? 2 : isVisited ? 0.8 : 0.3,
                     outline: "none",
-                    filter: (isVisited || isHighlighted) ? "url(#glow)" : "none",
-                    transition: "all 0.3s ease",
+                    filter: isHighlighted ? "url(#strongGlow)" : isVisited ? "url(#glow)" : "none",
+                    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                   },
                   hover: {
-                    fill: isHighlighted ? "#bfdbfe" : (isVisited ? "url(#visitedGradientHover)" : "#334155"),
-                    stroke: isHighlighted ? "#eff6ff" : (isVisited ? "#bfdbfe" : "#64748b"),
-                    strokeWidth: isHighlighted ? 3 : (isVisited ? 2 : 1),
+                    fill: isHighlighted
+                      ? "url(#highlightGradient)"
+                      : isVisited
+                        ? "url(#highlightGradient)"
+                        : "#334155",
+                    stroke: isVisited ? "#67e8f9" : "#475569",
+                    strokeWidth: isVisited ? 1.5 : 0.5,
                     outline: "none",
                     cursor: isVisited ? "pointer" : "default",
-                    filter: (isVisited || isHighlighted) ? "url(#glow)" : "none",
+                    filter: isVisited ? "url(#strongGlow)" : "none",
                   },
                   pressed: {
-                    fill: isHighlighted ? "#60a5fa" : (isVisited ? "#2563eb" : "#334155"),
+                    fill: isVisited ? "#22d3ee" : "#334155",
                     outline: "none",
                   },
                 }}
@@ -147,259 +178,222 @@ const WorldMap = React.memo(({
 
 WorldMap.displayName = 'WorldMap';
 
-const VirtualizedCountryList = React.memo(({ 
-  countries, 
-  selectedCountry, 
-  onCountrySelect,
-  highlightedCountryId 
-}: {
-  countries: VisitedCountry[];
-  selectedCountry: VisitedCountry | null;
-  onCountrySelect: (country: VisitedCountry) => void;
-  highlightedCountryId: string | null;
-}) => {
-  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
-  
-  const visibleCountries = useMemo(() => 
-    countries.slice(visibleRange.start, visibleRange.end),
-    [countries, visibleRange]
-  );
-
-  const loadMore = useCallback(() => {
-    setVisibleRange(prev => ({
-      start: prev.start,
-      end: Math.min(prev.end + 10, countries.length)
-    }));
-  }, [countries.length]);
-
-  return (
-    <div className="space-y-3">
-      {visibleCountries.map(country => (
-        <div 
-          key={country.id} 
-          className={`group relative bg-gradient-to-r from-gray-800/50 to-gray-700/30 hover:from-blue-900/50 hover:to-purple-900/30 p-3 sm:p-4 rounded-xl border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
-            selectedCountry?.id === country.id ? 'ring-2 ring-blue-500/50 bg-gradient-to-r from-blue-900/50 to-purple-900/30' : ''
-          } ${
-            highlightedCountryId === country.id ? 'bg-gradient-to-r from-blue-600/30 to-blue-700/20 border-blue-400/70 shadow-lg shadow-blue-500/30' : ''
-          }`}
-          onClick={() => onCountrySelect(country)}
-        >
-          <div className="flex items-center">
-            <MapPin className={`w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0 transition-colors ${
-              highlightedCountryId === country.id ? 'text-blue-300' : 'text-blue-400'
-            }`}/>
-            <span className={`font-semibold text-white group-hover:text-blue-300 transition-colors text-sm sm:text-base ${
-              highlightedCountryId === country.id ? 'text-blue-200' : ''
-            }`}>
-              {country.name}
-            </span>
-          </div>
-        </div>
-      ))}
-      
-      {visibleRange.end < countries.length && (
-        <button
-          onClick={loadMore}
-          className="w-full py-3 text-sm text-gray-400 hover:text-white transition-colors"
-        >
-          Load more countries...
-        </button>
-      )}
-    </div>
-  );
-});
-
-VirtualizedCountryList.displayName = 'VirtualizedCountryList';
-
 const InteractiveTravelMap = () => {
-  const [selectedCountry, setSelectedCountry] = useState<VisitedCountry | null>(null);
-  const [hoveredCountry, setHoveredCountry] = useState<string>("");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hoveredCountry, setHoveredCountry] = useState<{ name: string; isVisited: boolean } | null>(null);
   const [highlightedCountryId, setHighlightedCountryId] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<VisitedCountry | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
 
   const visitedCountryCodes = useMemo(
-    () => new Set(visitedCountries.map(c => c.id)), 
+    () => new Set(visitedCountries.map(c => c.id)),
     []
   );
 
-  const sortedCountries = useMemo(
-    () => visitedCountries.sort((a, b) => a.name.localeCompare(b.name)),
-    []
-  );
-
-  const continentCount = useMemo(() => {
-    return 6;
+  const regionStats = useMemo(() => {
+    const stats: Record<string, number> = {};
+    visitedCountries.forEach(c => {
+      stats[c.region] = (stats[c.region] || 0) + 1;
+    });
+    return stats;
   }, []);
 
   const handleCountryClick = useCallback((geo: GeographyProps) => {
     const country = visitedCountries.find(c => c.id === geo.id);
     if (country) {
       setSelectedCountry(country);
-      if (highlightedCountryId === country.id) {
-        setHighlightedCountryId(null);
-      } else {
-        setHighlightedCountryId(country.id);
-      }
-      if (window.innerWidth < 1024) {
-        setIsMobileMenuOpen(true);
-      }
+      setHighlightedCountryId(country.id);
     }
-  }, [highlightedCountryId]);
+  }, []);
 
-  const handleCountryHover = useCallback((name: string) => {
-    setHoveredCountry(name);
+  const handleCountryHover = useCallback((name: string, isVisited: boolean) => {
+    setHoveredCountry({ name, isVisited });
   }, []);
 
   const handleCountryLeave = useCallback(() => {
-    setHoveredCountry("");
+    setHoveredCountry(null);
   }, []);
 
-  const handleCountrySelect = useCallback((country: VisitedCountry) => {
-    setSelectedCountry(country);
-    if (highlightedCountryId === country.id) {
-      setHighlightedCountryId(null);
-    } else {
-      setHighlightedCountryId(country.id);
-    }
-  }, [highlightedCountryId]);
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  }, []);
 
-  const isCountryVisited = useCallback((countryName: string) => {
-    return visitedCountries.some(country => 
-      country.name.toLowerCase() === countryName.toLowerCase()
-    );
+  const closeModal = useCallback(() => {
+    setSelectedCountry(null);
+    setHighlightedCountryId(null);
   }, []);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900 text-white transition-all duration-700 ${
-      isLoaded ? 'opacity-100' : 'opacity-0'
-    }`}>
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div
+      className={`min-h-screen bg-[#030712] text-white overflow-hidden transition-opacity duration-1000 ${
+        isLoaded ? 'opacity-100' : 'opacity-0'
+      }`}
+      onMouseMove={handleMouseMove}
+    >
+      {/* Ambient background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/3 rounded-full blur-[150px]"></div>
       </div>
 
-      <header className={`relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 shadow-2xl transition-all duration-700 ${
-        isLoaded ? 'translate-y-0' : '-translate-y-4'
-      }`} style={{ transitionDelay: '100ms' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="relative flex items-center justify-center">
-            <Link href="/" className="absolute left-0 group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
-              <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-blue-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/20">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-purple-600/0 group-hover:from-blue-600/20 group-hover:to-purple-600/20 rounded-xl transition-all duration-300"></div>
-                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+      {/* Navigation */}
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+        isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link
+              href="/"
+              className="group flex items-center gap-3 text-gray-400 hover:text-white transition-all duration-300"
+            >
+              <div className="relative">
+                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-600/20 to-purple-600/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 group-hover:border-cyan-500/50 group-hover:bg-cyan-500/10 transition-all duration-300">
+                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform duration-300" />
+                </div>
+              </div>
+              <div className="hidden sm:flex flex-col">
+                <span className="text-sm font-medium">Back</span>
+                <span className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">Home</span>
               </div>
             </Link>
-            
-            <div className="text-center">
-              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-blue-300 to-purple-300 bg-clip-text text-transparent animate-gradient">
+
+            <div className="flex items-center gap-2">
+              <Plane className="w-5 h-5 text-cyan-400" />
+              <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                 Travel Map
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">
-                Exploring {visitedCountries.length} countries across the globe
-              </p>
+              </span>
             </div>
-            
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="absolute right-0 lg:hidden p-2 rounded-lg bg-gray-800/50 hover:bg-blue-500/20 transition-all duration-300"
-            >
-              {isMobileMenuOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-            </button>
+
+            <div className="w-[88px] sm:w-[100px]"></div>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10">
-        <div className={`lg:hidden transition-all duration-300 overflow-hidden ${
-          isMobileMenuOpen ? 'max-h-96' : 'max-h-0'
+      {/* Main map container */}
+      <main className="relative h-screen w-full flex items-center justify-center" style={{ marginTop: "-40px" }}>
+        <div className={`w-full h-full transition-all duration-1000 ${
+          isLoaded ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}>
-          <div className="bg-gray-900/90 backdrop-blur-xl border-b border-gray-700/30 p-4 max-h-96 overflow-y-auto">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold flex items-center">
-                <Globe className="w-5 h-5 mr-2 text-blue-400"/>
-                Visited Countries ({visitedCountries.length})
-              </h3>
-              <span className="text-xs text-gray-400">Tap to highlight</span>
+          <WorldMap
+            visitedCountryCodes={visitedCountryCodes}
+            onCountryClick={handleCountryClick}
+            onCountryHover={handleCountryHover}
+            onCountryLeave={handleCountryLeave}
+            highlightedCountryId={highlightedCountryId}
+          />
+        </div>
+
+        {/* Floating stats panel */}
+        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-all duration-700 ${
+          isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        }`} style={{ transitionDelay: '400ms' }}>
+          <div className="flex items-center gap-1 p-1.5 bg-black/40 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl shadow-black/50">
+            <div className="px-5 py-3 text-center">
+              <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                {visitedCountries.length}
+              </div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider mt-0.5">Countries</div>
             </div>
-            <VirtualizedCountryList
-              countries={sortedCountries}
-              selectedCountry={selectedCountry}
-              onCountrySelect={handleCountrySelect}
-              highlightedCountryId={highlightedCountryId}
-            />
+            <div className="w-px h-10 bg-white/10"></div>
+            <div className="px-5 py-3 text-center">
+              <div className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                {Object.keys(regionStats).length}
+              </div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider mt-0.5">Regions</div>
+            </div>
+            <div className="w-px h-10 bg-white/10"></div>
+            <div className="px-5 py-3 text-center">
+              <div className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                {Math.round((visitedCountries.length / 195) * 100)}%
+              </div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider mt-0.5">World</div>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 h-[calc(100vh-100px)]">
-          <div className={`lg:col-span-3 relative bg-gradient-to-br from-gray-800/30 to-gray-900/50 backdrop-blur-sm transition-all duration-700 ${
-            isLoaded ? 'opacity-100' : 'opacity-0'
-          }`} style={{ transitionDelay: '200ms' }}>
-            <WorldMap
-              visitedCountryCodes={visitedCountryCodes}
-              onCountryClick={handleCountryClick}
-              onCountryHover={handleCountryHover}
-              onCountryLeave={handleCountryLeave}
-              highlightedCountryId={highlightedCountryId}
-            />
-            
-            {hoveredCountry && (
-              <div className={`absolute bottom-4 left-4 right-4 sm:right-auto bg-gray-900/90 backdrop-blur-lg text-white text-sm px-3 sm:px-4 py-2 rounded-xl border border-gray-700/50 shadow-2xl transition-all duration-300 ${
-                isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`}>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full ${isCountryVisited(hoveredCountry) ? 'bg-blue-400' : 'bg-gray-500'}`}></div>
-                  <span className="font-medium truncate">{hoveredCountry}</span>
-                  {isCountryVisited(hoveredCountry) && <span className="text-blue-300 text-xs">✓ Visited</span>}
-                </div>
+        {/* Hover tooltip */}
+        {hoveredCountry && (
+          <div
+            className="fixed z-50 pointer-events-none transition-opacity duration-150"
+            style={{
+              left: mousePos.x + 16,
+              top: mousePos.y + 16,
+            }}
+          >
+            <div className={`px-4 py-2.5 rounded-xl backdrop-blur-xl border shadow-xl ${
+              hoveredCountry.isVisited
+                ? 'bg-cyan-500/20 border-cyan-500/30 shadow-cyan-500/20'
+                : 'bg-gray-800/80 border-gray-700/50'
+            }`}>
+              <div className="flex items-center gap-2">
+                {hoveredCountry.isVisited && (
+                  <MapPin className="w-4 h-4 text-cyan-400" />
+                )}
+                <span className={`font-medium ${hoveredCountry.isVisited ? 'text-cyan-100' : 'text-gray-300'}`}>
+                  {hoveredCountry.name}
+                </span>
+                {hoveredCountry.isVisited && (
+                  <span className="text-xs text-cyan-400 ml-1">Visited</span>
+                )}
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-            <div className={`absolute top-4 right-4 transition-all duration-700 ${
-              isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
-            }`} style={{ transitionDelay: '300ms' }}>
-              <div className="bg-gray-900/80 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-gray-700/30 shadow-2xl">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <div className="text-center">
-                    <div className="text-lg sm:text-2xl font-bold text-blue-400">{visitedCountries.length}</div>
-                    <div className="text-xs text-gray-400">Countries</div>
+        {/* Country detail modal */}
+        {selectedCountry && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={closeModal}
+            ></div>
+            <div className={`relative max-w-sm w-full transition-all duration-300 ${
+              selectedCountry ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+            }`}>
+              <div className="bg-gray-900/90 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+                <div className="h-2 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">{selectedCountry.name}</h3>
+                      <p className="text-gray-400 text-sm mt-1">{selectedCountry.region}</p>
+                    </div>
+                    <button
+                      onClick={closeModal}
+                      className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-400" />
+                    </button>
                   </div>
-                  <div className="w-px h-6 sm:h-8 bg-gray-700"></div>
-                  <div className="text-center">
-                    <div className="text-lg sm:text-2xl font-bold text-purple-400">{continentCount}</div>
-                    <div className="text-xs text-gray-400">Continents</div>
+                  <div className="flex items-center gap-2 text-cyan-400">
+                    <MapPin className="w-5 h-5" />
+                    <span className="text-sm font-medium">Explored</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        )}
 
-          <div className={`hidden lg:block lg:col-span-1 bg-gray-900/60 backdrop-blur-xl border-l border-gray-700/30 overflow-y-auto transition-all duration-700 ${
-            isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
-          }`} style={{ transitionDelay: '400ms' }}>
-            <div className="p-6">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold mb-2 flex items-center">
-                  <Globe className="w-6 h-6 mr-3 text-blue-400"/>
-                  Visited Countries
-                </h2>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Each destination has shaped my perspective on technology, culture, and innovation.
-                  Click any country name to highlight it on the map.
-                </p>
-              </div>
-              
-              <VirtualizedCountryList
-                countries={sortedCountries}
-                selectedCountry={selectedCountry}
-                onCountrySelect={handleCountrySelect}
-                highlightedCountryId={highlightedCountryId}
-              />
+        {/* Region legend */}
+        <div className={`absolute top-24 right-6 transition-all duration-700 hidden lg:block ${
+          isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
+        }`} style={{ transitionDelay: '600ms' }}>
+          <div className="p-4 bg-black/30 backdrop-blur-xl rounded-2xl border border-white/5">
+            <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">By Region</div>
+            <div className="space-y-2">
+              {Object.entries(regionStats).sort((a, b) => b[1] - a[1]).map(([region, count]) => (
+                <div key={region} className="flex items-center justify-between gap-4">
+                  <span className="text-sm text-gray-400">{region}</span>
+                  <span className="text-sm font-medium text-white">{count}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

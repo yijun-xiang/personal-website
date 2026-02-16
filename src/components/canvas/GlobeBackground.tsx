@@ -7,7 +7,7 @@ const GlobeBackground = () => {
     const meshRef = useRef<THREE.Group>(null);
 
     const geometry = useMemo(() => {
-        const sphere = new THREE.SphereGeometry(1.5, 45, 45);
+        const sphere = new THREE.SphereGeometry(1.2, 40, 40);
         const vertices = sphere.attributes.position.array;
         const buffer = new Float32Array(vertices);
         const geom = new THREE.BufferGeometry();
@@ -17,20 +17,19 @@ const GlobeBackground = () => {
 
     useFrame(() => {
         if (meshRef.current) {
-            meshRef.current.rotation.y += 0.0005;
+            meshRef.current.rotation.y += 0.0008;
         }
     });
 
     return (
-        <group ref={meshRef}>
+        <group ref={meshRef} position={[3.5, -2, -2]}>
             <points geometry={geometry}>
                 <pointsMaterial
-                    size={0.008}
+                    size={0.006}
                     color="#4f8bda"
                     sizeAttenuation
-                    transparent={false}
-                    alphaTest={0.5}
-                    opacity={1.0}
+                    transparent
+                    opacity={0.6}
                 />
             </points>
         </group>

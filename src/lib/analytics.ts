@@ -38,7 +38,7 @@ declare global {
   };
   
   export const trackEvent = {
-    socialClick: (platform: 'email' | 'linkedin' | 'github') => {
+    socialClick: (platform: 'email' | 'linkedin' | 'github' | 'google_scholar') => {
       event({
         action: 'click',
         category: 'social',

@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Send, Bot, User, RefreshCw, Trash2, Sparkles, MessageCircle, Zap, AlertCircle, Brain, Star, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import { ArrowLeft, Send, Bot, User, RefreshCw, Trash2, Sparkles, MessageCircle, Zap, AlertCircle, Brain, Star, ChevronLeft, ChevronRight, Info, Copy, Check, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -9,6 +10,7 @@ interface Message {
   isUser: boolean;
   timestamp: Date;
   isLoading?: boolean;
+  feedback?: 'up' | 'down' | null;
 }
 
 interface MessageCount {
@@ -20,15 +22,18 @@ type MessageBubbleProps = {
   message: Message;
   index: number;
   isSidebarCollapsed?: boolean;
+  onCopy?: (text: string) => void;
+  onFeedback?: (id: number, feedback: 'up' | 'down') => void;
+  copiedId?: number | null;
 };
 
-const MessageBubbleComponent = ({ message, index, isSidebarCollapsed = false }: MessageBubbleProps) => (
+const MessageBubbleComponent = ({ message, index, isSidebarCollapsed = false, onCopy, onFeedback, copiedId }: MessageBubbleProps) => (
   <div
     className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-3 duration-500`}
     style={{ animationDelay: `${index * 100}ms` }}
   >
     <div
-      className={`${isSidebarCollapsed ? 'max-w-[85%] sm:max-w-2xl lg:max-w-3xl' : 'max-w-[85%] sm:max-w-xl lg:max-w-2xl'} relative group ${
+      className={`${isSidebarCollapsed ? 'max-w-[85%] sm:max-w-2xl lg:max-w-3xl' : 'max-w-[85%] sm:max-w-xl lg:max-w-2xl'} relative group transition-all duration-500 ${
         message.isUser ? 'order-2' : 'order-1'
       }`}
     >
@@ -42,7 +47,7 @@ const MessageBubbleComponent = ({ message, index, isSidebarCollapsed = false }: 
         {message.isUser && (
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity"></div>
         )}
-        
+
         <div className="flex items-start space-x-2 sm:space-x-3 relative z-10">
           {!message.isUser && (
             <div className="flex-shrink-0">
@@ -57,7 +62,7 @@ const MessageBubbleComponent = ({ message, index, isSidebarCollapsed = false }: 
               )}
             </div>
           )}
-          
+
           <div className="flex-1 min-w-0">
             {message.isLoading ? (
               <div className="flex items-center space-x-3">
@@ -70,15 +75,52 @@ const MessageBubbleComponent = ({ message, index, isSidebarCollapsed = false }: 
               </div>
             ) : (
               <div>
-                <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
-                <p className="text-xs opacity-50 mt-2 flex items-center space-x-1">
-                  <span>{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  {message.isUser && <span className="ml-2">✓</span>}
-                </p>
+                {message.isUser ? (
+                  <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
+                ) : (
+                  <div className="text-xs sm:text-sm leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5">
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                  </div>
+                )}
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs opacity-50 flex items-center space-x-1">
+                    <span>{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    {message.isUser && <span className="ml-2">✓</span>}
+                  </p>
+                  {!message.isUser && !message.isLoading && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => onCopy?.(message.text)}
+                        className="p-1.5 hover:bg-gray-700/50 rounded-lg transition-colors"
+                        title="Copy response"
+                      >
+                        {copiedId === message.id ? (
+                          <Check className="w-3 h-3 text-green-400" />
+                        ) : (
+                          <Copy className="w-3 h-3 text-gray-400 hover:text-white" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => onFeedback?.(message.id, 'up')}
+                        className={`p-1.5 hover:bg-gray-700/50 rounded-lg transition-colors ${message.feedback === 'up' ? 'bg-green-500/20' : ''}`}
+                        title="Good response"
+                      >
+                        <ThumbsUp className={`w-3 h-3 ${message.feedback === 'up' ? 'text-green-400' : 'text-gray-400 hover:text-white'}`} />
+                      </button>
+                      <button
+                        onClick={() => onFeedback?.(message.id, 'down')}
+                        className={`p-1.5 hover:bg-gray-700/50 rounded-lg transition-colors ${message.feedback === 'down' ? 'bg-red-500/20' : ''}`}
+                        title="Bad response"
+                      >
+                        <ThumbsDown className={`w-3 h-3 ${message.feedback === 'down' ? 'text-red-400' : 'text-gray-400 hover:text-white'}`} />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
-          
+
           {message.isUser && (
             <div className="flex-shrink-0">
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 p-1.5 sm:p-2 shadow-lg shadow-indigo-500/30">
@@ -94,11 +136,13 @@ const MessageBubbleComponent = ({ message, index, isSidebarCollapsed = false }: 
 
 MessageBubbleComponent.displayName = 'MessageBubbleComponent';
 
-const MessageBubble = lazy(() => Promise.resolve({ 
+const MessageBubble = lazy(() => Promise.resolve({
   default: React.memo<MessageBubbleProps>(MessageBubbleComponent, (prevProps, nextProps) => {
-    return prevProps.message.id === nextProps.message.id && 
+    return prevProps.message.id === nextProps.message.id &&
            prevProps.index === nextProps.index &&
-           prevProps.isSidebarCollapsed === nextProps.isSidebarCollapsed;
+           prevProps.isSidebarCollapsed === nextProps.isSidebarCollapsed &&
+           prevProps.copiedId === nextProps.copiedId &&
+           prevProps.message.feedback === nextProps.message.feedback;
   })
 }));
 
@@ -142,6 +186,7 @@ const ChatbotPage = () => {
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showMobileInfo, setShowMobileInfo] = useState(false);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   
   useEffect(() => {
     setIsPageLoaded(true);
@@ -221,13 +266,8 @@ const ChatbotPage = () => {
     }
   }, []);
 
-  const handleSendMessage = useCallback(async () => {
-    if (!inputText.trim() || isLoading) return;
-
-    if (inputText.length > 500) {
-      alert("Whoa there! Even Yijun&apos;s genius thoughts are more concise. Keep it under 500 characters! 😅");
-      return;
-    }
+  const sendMessage = useCallback(async (messageText: string) => {
+    if (!messageText.trim() || isLoading) return;
 
     const now = Date.now();
     if (now > messageCount.resetTime) {
@@ -235,21 +275,20 @@ const ChatbotPage = () => {
       setMessageCount(newCount);
       localStorage.setItem('messageCount', JSON.stringify(newCount));
     }
-    
+
     if (messageCount.count >= DAILY_LIMIT) {
-      alert("Hold up! You&apos;ve maxed out your daily Yijun wisdom quota! 🎯 Come back tomorrow for more legendary insights! (Seriously though, Yijun needs to save on API costs 💸)");
       return;
     }
 
     const userMessage: Message = {
       id: Date.now(),
-      text: inputText.trim(),
+      text: messageText.trim(),
       isUser: true,
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
-    
+
     const loadingMessage: Message = {
       id: Date.now() + 1,
       text: '',
@@ -258,18 +297,15 @@ const ChatbotPage = () => {
       isLoading: true
     };
     setMessages(prev => [...prev, loadingMessage]);
-
-    const messageToSend = inputText.trim();
-    setInputText('');
     setIsLoading(true);
 
     try {
-      const { response, remaining, isRateLimited } = await callApiRoute(messageToSend);
-      
+      const { response, remaining, isRateLimited } = await callApiRoute(messageText.trim());
+
       if (remaining !== undefined) {
         setServerRemaining(remaining);
       }
-      
+
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
         return [...filtered, {
@@ -286,28 +322,42 @@ const ChatbotPage = () => {
         localStorage.setItem('messageCount', JSON.stringify(newCount));
       }
     } catch (error) {
-      console.error("Failed to handle send message:", error);
-      let errorMessage = "An unknown error occurred.";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
+      console.error("Failed to send message:", error);
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
         return [...filtered, {
           id: Date.now() + 2,
-          text: `I&apos;m sorry, I encountered an error: ${errorMessage}`,
+          text: "An error occurred. Please try again.",
           isUser: false,
           timestamp: new Date()
         }];
       });
     } finally {
       setIsLoading(false);
-      if (inputRef.current && window.innerWidth >= 768) {
-        inputRef.current.focus();
-      }
     }
-  }, [inputText, isLoading, callApiRoute, messageCount]);
+  }, [isLoading, callApiRoute, messageCount]);
+
+  const handleSendMessage = useCallback(async () => {
+    if (!inputText.trim() || isLoading) return;
+
+    if (inputText.length > 500) {
+      alert("Whoa there! Even Yijun's genius thoughts are more concise. Keep it under 500 characters!");
+      return;
+    }
+
+    if (messageCount.count >= DAILY_LIMIT) {
+      alert("Hold up! You've maxed out your daily Yijun wisdom quota! Come back tomorrow for more legendary insights!");
+      return;
+    }
+
+    const messageToSend = inputText.trim();
+    setInputText('');
+    await sendMessage(messageToSend);
+
+    if (inputRef.current && window.innerWidth >= 768) {
+      inputRef.current.focus();
+    }
+  }, [inputText, isLoading, messageCount.count, sendMessage]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -333,10 +383,24 @@ const ChatbotPage = () => {
   ], []);
 
   const handleSuggestionClick = useCallback((question: string) => {
-    setInputText(question);
-    if (inputRef.current) {
-      inputRef.current.focus();
+    sendMessage(question);
+  }, [sendMessage]);
+
+  const handleCopy = useCallback(async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    const messageId = messages.find(m => m.text === text)?.id;
+    if (messageId) {
+      setCopiedId(messageId);
+      setTimeout(() => setCopiedId(null), 2000);
     }
+  }, [messages]);
+
+  const handleFeedback = useCallback((id: number, feedback: 'up' | 'down') => {
+    setMessages(prev => prev.map(msg =>
+      msg.id === id
+        ? { ...msg, feedback: msg.feedback === feedback ? null : feedback }
+        : msg
+    ));
   }, []);
 
   const characterCount = useMemo(() => inputText.length, [inputText]);
@@ -367,15 +431,21 @@ const ChatbotPage = () => {
       <header className={`relative z-20 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/30 shadow-2xl transition-all duration-700 flex-shrink-0 ${
         isPageLoaded ? 'translate-y-0' : '-translate-y-4'
       }`} style={{ transitionDelay: '100ms' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="relative flex items-center justify-center">
-            <Link href="/" className="absolute left-0 group flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white transition-all duration-300">
-              <div className="relative p-2 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-700/50 backdrop-blur-xl border border-gray-600/50 group-hover:border-cyan-500/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cyan-500/20">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/0 to-blue-600/0 group-hover:from-cyan-600/20 group-hover:to-blue-600/20 rounded-xl transition-all duration-300"></div>
-                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="group flex items-center gap-3 text-gray-400 hover:text-white transition-all duration-300">
+              <div className="relative">
+                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-cyan-500/50 group-hover:bg-cyan-500/10 transition-all duration-300">
+                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform duration-300" />
+                </div>
+              </div>
+              <div className="hidden sm:flex flex-col">
+                <span className="text-sm font-medium">Back</span>
+                <span className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">Home</span>
               </div>
             </Link>
-            
+
             <div className="text-center">
               <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-300 to-blue-300 bg-clip-text text-transparent animate-gradient">
                 Stan AI
@@ -385,8 +455,8 @@ const ChatbotPage = () => {
                 Powered by GPT • Online
               </p>
             </div>
-            
-            <div className="absolute right-0 flex items-center space-x-2">
+
+            <div className="flex items-center space-x-2">
               <button
                 onClick={clearChat}
                 className="p-2 text-gray-400 hover:text-white hover:bg-red-500/20 rounded-lg transition-all duration-300 group"
@@ -406,11 +476,13 @@ const ChatbotPage = () => {
         </div>
       </header>
 
-      <div className={`flex-1 px-4 sm:px-6 py-3 relative z-10 transition-all duration-700 overflow-hidden flex ${
+      <div className={`flex-1 relative z-10 transition-all duration-700 overflow-hidden flex ${
         isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
       }`} style={{ transitionDelay: '200ms' }}>
-        <div className={`w-full ${isSidebarCollapsed ? 'max-w-6xl' : 'max-w-7xl'} mx-auto flex gap-4 transition-all duration-500`}>
-          <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto px-6 py-3 flex gap-4">
+          <div className="flex-1 flex flex-col overflow-hidden" style={{
+            transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
             <div className={`mb-3 bg-gradient-to-r ${remainingToday <= 5 ? 'from-red-900/20 to-orange-900/20' : remainingToday <= 10 ? 'from-yellow-900/20 to-orange-900/20' : 'from-cyan-900/20 to-blue-900/20'} backdrop-blur-sm rounded-xl p-3 border ${remainingToday <= 5 ? 'border-red-700/30' : remainingToday <= 10 ? 'border-yellow-700/30' : 'border-cyan-700/30'} flex items-center justify-between`}>
               <div className="flex items-center space-x-2">
                 <div className={`p-1.5 rounded-lg ${remainingToday <= 5 ? 'bg-red-500/20' : remainingToday <= 10 ? 'bg-yellow-500/20' : 'bg-cyan-500/20'}`}>
@@ -423,54 +495,64 @@ const ChatbotPage = () => {
               )}
             </div>
 
-            <div 
+            <div
               ref={messagesContainerRef}
-              className={`flex-1 overflow-y-auto space-y-3 sm:space-y-4 ${messages.length <= 2 ? 'mb-2' : 'mb-3'} scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent bg-gray-800/10 rounded-xl p-3 sm:p-4 border border-gray-700/20`}
+              className="flex-1 overflow-y-auto mb-3 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent bg-gray-800/10 rounded-xl p-3 sm:p-4 border border-gray-700/20 flex flex-col"
             >
-              {hasMoreAbove && (
-                <div className="text-center py-2">
-                  <span className="text-xs text-gray-500 bg-gray-800/30 px-3 py-1 rounded-full">Showing recent messages</span>
+              <div className="space-y-3 sm:space-y-4 flex-1">
+                {hasMoreAbove && (
+                  <div className="text-center py-2">
+                    <span className="text-xs text-gray-500 bg-gray-800/30 px-3 py-1 rounded-full">Showing recent messages</span>
+                  </div>
+                )}
+
+                <Suspense fallback={<div className="text-center text-gray-400">Loading messages...</div>}>
+                  {visibleMessages.map((message, index) => (
+                    <MessageBubble
+                      key={message.id}
+                      message={message}
+                      index={index}
+                      isSidebarCollapsed={isSidebarCollapsed}
+                      onCopy={handleCopy}
+                      onFeedback={handleFeedback}
+                      copiedId={copiedId}
+                    />
+                  ))}
+                </Suspense>
+                <div ref={messagesEndRef} />
+              </div>
+
+              {messages.length <= 2 && (
+                <div className={`mt-auto pt-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-500 transition-all ${
+                  isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`} style={{ transitionDelay: '300ms' }}>
+                  <div className="text-center mb-3">
+                    <p className="text-xs sm:text-sm text-gray-400 flex items-center justify-center space-x-2">
+                      <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400" />
+                      <span>Quick questions to get started:</span>
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {suggestedQuestions.map((question, index) => (
+                      <button
+                        key={question.text}
+                        onClick={() => handleSuggestionClick(question.text)}
+                        className="group p-2 sm:p-3 bg-gray-700/40 hover:bg-gray-700/60 border border-gray-600/30 hover:border-cyan-500/50 rounded-xl transition-all duration-300 text-left hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10"
+                        style={{ animationDelay: `${index * 100 + 600}ms` }}
+                        disabled={remainingToday <= 0}
+                      >
+                        <div className='flex items-center space-x-2'>
+                          <span className="text-base sm:text-lg">{question.icon}</span>
+                          <span className="text-xs sm:text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
+                            {question.text}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
-              
-              <Suspense fallback={<div className="text-center text-gray-400">Loading messages...</div>}>
-                {visibleMessages.map((message, index) => (
-                  <MessageBubble key={message.id} message={message} index={index} isSidebarCollapsed={isSidebarCollapsed} />
-                ))}
-              </Suspense>
-              <div ref={messagesEndRef} />
             </div>
-
-            {messages.length <= 2 && (
-              <div className={`mb-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-500 transition-all ${
-                isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`} style={{ transitionDelay: '300ms' }}>
-                <div className="text-center mb-2">
-                  <p className="text-xs sm:text-sm text-gray-400 flex items-center justify-center space-x-2">
-                    <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400" />
-                    <span>Quick questions to get started:</span>
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {suggestedQuestions.map((question, index) => (
-                    <button
-                      key={question.text}
-                      onClick={() => handleSuggestionClick(question.text)}
-                      className="group p-2 sm:p-3 bg-gray-800/60 hover:bg-gray-700/80 border border-gray-700/50 hover:border-cyan-500/50 rounded-xl transition-all duration-300 text-left hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/10"
-                      style={{ animationDelay: `${index * 100 + 600}ms` }}
-                      disabled={remainingToday <= 0}
-                    >
-                      <div className='flex items-center space-x-2'>
-                        <span className="text-base sm:text-lg">{question.icon}</span>
-                        <span className="text-xs sm:text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
-                          {question.text}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <div className={`relative transition-all duration-700 ${
               isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -527,11 +609,14 @@ const ChatbotPage = () => {
             </div>
           </div>
 
-          <div className={`hidden lg:block transition-all duration-500 relative flex-shrink-0 ${
+          <div className={`hidden lg:block relative flex-shrink-0 ${
             isSidebarCollapsed ? 'w-12' : 'w-80'
           } ${
             isPageLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
-          }`} style={{ transitionDelay: '300ms' }}>
+          }`} style={{
+            transition: 'width 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 700ms, transform 700ms',
+            transitionDelay: isPageLoaded ? '0ms' : '300ms'
+          }}>
             <div className="relative h-full">
               <button
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}

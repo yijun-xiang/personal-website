@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Mail, Github, Linkedin, Bot, Globe, ChevronRight } from 'lucide-react';
+import { Mail, Github, Linkedin, Bot, Globe, ChevronRight, GraduationCap } from 'lucide-react';
 import { personalInfo } from '@/lib/data';
 import BerkeleyLogo from '@/components/ui/BerkeleyLogo';
 import ScrambleText from '@/components/ui/ScrambleText';
@@ -74,15 +74,25 @@ const Hero = () => {
             >
               <Linkedin className="w-6 h-6 text-gray-300 hover:text-blue-300" />
             </a>
-            <a 
-              href={personalInfo.github} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              title="GitHub" 
+            <a
+              href={personalInfo.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="GitHub"
               onClick={() => trackEvent.socialClick('github')}
               className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
             >
               <Github className="w-6 h-6 text-gray-300 hover:text-blue-300" />
+            </a>
+            <a
+              href={personalInfo.googleScholar}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Google Scholar"
+              onClick={() => trackEvent.socialClick('google_scholar')}
+              className="p-3 rounded-full bg-gray-700/30 hover:bg-blue-500/20 transition-all duration-300 border border-gray-600/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
+            >
+              <GraduationCap className="w-6 h-6 text-gray-300 hover:text-blue-300" />
             </a>
           </div>
         </header>

@@ -3,6 +3,14 @@ import React, { useState, useMemo, useCallback, lazy, Suspense, useEffect } from
 import Link from 'next/link';
 import { ArrowLeft, X, Plane, MapPin } from 'lucide-react';
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+  return isMobile;
+};
+
 const ComposableMap = lazy(() => import('react-simple-maps').then(module => ({ default: module.ComposableMap })));
 const Geographies = lazy(() => import('react-simple-maps').then(module => ({ default: module.Geographies })));
 const Geography = lazy(() => import('react-simple-maps').then(module => ({ default: module.Geography })));
@@ -70,13 +78,15 @@ const WorldMap = React.memo(({
   onCountryClick,
   onCountryHover,
   onCountryLeave,
-  highlightedCountryId
+  highlightedCountryId,
+  isMobile
 }: {
   visitedCountryCodes: Set<string>;
   onCountryClick: (geo: GeographyProps) => void;
   onCountryHover: (name: string, isVisited: boolean) => void;
   onCountryLeave: () => void;
   highlightedCountryId: string | null;
+  isMobile: boolean;
 }) => (
   <Suspense fallback={<MapLoader />}>
     <ComposableMap
@@ -101,21 +111,25 @@ const WorldMap = React.memo(({
           <stop offset="0%" stopColor="#22d3ee" />
           <stop offset="100%" stopColor="#a78bfa" />
         </linearGradient>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-        <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
+        {!isMobile && (
+          <>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </>
+        )}
       </defs>
 
       <rect x="0" y="0" width="800" height="500" fill="url(#oceanGradient)" />
@@ -147,8 +161,8 @@ const WorldMap = React.memo(({
                         : "#334155",
                     strokeWidth: isHighlighted ? 2 : isVisited ? 0.8 : 0.3,
                     outline: "none",
-                    filter: isHighlighted ? "url(#strongGlow)" : isVisited ? "url(#glow)" : "none",
-                    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                    filter: isMobile ? "none" : isHighlighted ? "url(#strongGlow)" : isVisited ? "url(#glow)" : "none",
+                    transition: isMobile ? "none" : "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                   },
                   hover: {
                     fill: isHighlighted
@@ -160,7 +174,7 @@ const WorldMap = React.memo(({
                     strokeWidth: isVisited ? 1.5 : 0.5,
                     outline: "none",
                     cursor: isVisited ? "pointer" : "default",
-                    filter: isVisited ? "url(#strongGlow)" : "none",
+                    filter: isMobile ? "none" : isVisited ? "url(#strongGlow)" : "none",
                   },
                   pressed: {
                     fill: isVisited ? "#22d3ee" : "#334155",
@@ -179,6 +193,7 @@ const WorldMap = React.memo(({
 WorldMap.displayName = 'WorldMap';
 
 const InteractiveTravelMap = () => {
+  const isMobile = useIsMobile();
   const [hoveredCountry, setHoveredCountry] = useState<{ name: string; isVisited: boolean } | null>(null);
   const [highlightedCountryId, setHighlightedCountryId] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<VisitedCountry | null>(null);
@@ -234,12 +249,14 @@ const InteractiveTravelMap = () => {
       }`}
       onMouseMove={handleMouseMove}
     >
-      {/* Ambient background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px]"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/3 rounded-full blur-[150px]"></div>
-      </div>
+      {/* Ambient background - hidden on mobile for performance */}
+      {!isMobile && (
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px]"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/3 rounded-full blur-[150px]"></div>
+        </div>
+      )}
 
       {/* Navigation */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
@@ -286,6 +303,7 @@ const InteractiveTravelMap = () => {
             onCountryHover={handleCountryHover}
             onCountryLeave={handleCountryLeave}
             highlightedCountryId={highlightedCountryId}
+            isMobile={isMobile}
           />
         </div>
 

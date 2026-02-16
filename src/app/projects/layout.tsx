@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   keywords: ['ML Projects', 'AI Projects', 'Image Similarity', 'Code Review', 'FastAPI', 'React', 'TypeScript'],
   openGraph: {
     title: 'Projects | Yijun Xiang',
-    description: 'Building production-ready ML systems and AI-powered developer tools.',
+    description: 'ML systems and AI-powered developer tools built by Yijun Xiang.',
     url: 'https://yijunxiang.com/projects',
     siteName: 'Yijun Xiang',
     type: 'website',

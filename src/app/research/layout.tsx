@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   keywords: ['NLP Research', 'Machine Learning', 'Data Augmentation', 'LLM', 'Algorithmic Fairness', 'Educational Measurement'],
   openGraph: {
     title: 'Research | Yijun Xiang',
-    description: 'Investigating novel approaches to mitigate algorithmic bias in large-scale ML systems.',
+    description: 'Academic publications by Yijun Xiang on data augmentation, imbalanced learning, and educational measurement.',
     url: 'https://yijunxiang.com/research',
     siteName: 'Yijun Xiang',
     type: 'website',

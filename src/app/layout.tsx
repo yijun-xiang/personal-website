@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Yijun Xiang",
-  description: "AI Developer & Researcher - Building intelligent systems to solve human-centric problems",
+  description: "Yijun Xiang - AI Developer & Researcher. Building intelligent systems to solve human-centric problems.",
   keywords: ["AI", "Machine Learning", "Software Engineer", "UC Berkeley", "Computer Science"],
   authors: [{ name: "Yijun Xiang" }],
   icons: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
   openGraph: {
     title: "Yijun Xiang",
-    description: "AI Developer & Researcher specializing in intelligent systems and human-centric AI solutions",
+    description: "Yijun Xiang - AI Developer & Researcher specializing in intelligent systems and human-centric AI solutions.",
     url: "https://yijunxiang.com",
     siteName: "Yijun Xiang",
     type: "website",

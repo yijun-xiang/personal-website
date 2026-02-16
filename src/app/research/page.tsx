@@ -157,8 +157,8 @@ const ResearchPage = () => {
             <div className="h-px bg-gradient-to-l from-transparent to-green-400/50 w-16 sm:w-20"></div>
           </div>
           <p className="text-xl text-gray-300 leading-relaxed mb-8">
-            Investigating novel approaches to mitigate algorithmic bias in large-scale ML systems,
-            with emphasis on data augmentation strategies and generative model applications.
+            Exploring data augmentation strategies and generative AI methods to address
+            imbalanced data challenges in automated scoring and educational measurement.
           </p>
           <div className="flex items-center justify-center gap-6 sm:gap-8">
             <motion.div

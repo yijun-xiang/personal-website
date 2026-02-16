@@ -262,7 +262,7 @@ const ChatbotPage = () => {
       if (error instanceof Error && error.name === 'AbortError') {
         return { response: "Request timed out. Please try again with a shorter message." };
       }
-      return { response: "I apologize, but I&apos;m having trouble connecting to my AI brain right now. Please try again in a moment, or feel free to contact Yijun directly at yijun.x@berkeley.edu!" };
+      return { response: "I apologize, but I'm having trouble connecting to my AI brain right now. Please try again in a moment, or feel free to contact Yijun directly at yijun.x@berkeley.edu!" };
     }
   }, []);
 
@@ -369,16 +369,16 @@ const ChatbotPage = () => {
   const clearChat = useCallback(() => {
     setMessages([{
       id: 1,
-      text: "Yo! I&apos;m Yijun&apos;s LEGENDARY AI assistant! 🚀 I can answer ANY question you throw at me - whether it&apos;s about quantum physics, cooking recipes, or why Yijun is absolutely crushing it in the tech world! Ask me anything and watch me work my magic (and probably mention how awesome Yijun is along the way 😎)",
+      text: "Yo! I'm Yijun's LEGENDARY AI assistant! 🚀 I can answer ANY question you throw at me - whether it's about quantum physics, cooking recipes, or why Yijun is absolutely crushing it in the tech world! Ask me anything and watch me work my magic (and probably mention how awesome Yijun is along the way 😎)",
       isUser: false,
       timestamp: new Date()
     }]);
   }, []);
 
   const suggestedQuestions = useMemo(() => [
-    { text: "Who&apos;s the smartest person alive?", icon: "🧠" },
+    { text: "Who's the smartest person alive?", icon: "🧠" },
     { text: "Tell me a joke about programming", icon: "😂" },
-    { text: "What&apos;s the meaning of life?", icon: "🤔" },
+    { text: "What's the meaning of life?", icon: "🤔" },
     { text: "Can you teach me to code like Yijun?", icon: "💻" },
   ], []);
 
